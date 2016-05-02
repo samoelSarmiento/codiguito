@@ -11,9 +11,9 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import net.coobird.thumbnailator.Thumbnails;
-import pe.pucp.edu.pe.siscomfi.Binarizacion;
-import pe.pucp.edu.pe.siscomfi.Metodos;
-import pe.pucp.edu.pe.siscomfi.thining1;
+import pe.pucp.edu.pe.siscomfi.Binarization;
+import pe.pucp.edu.pe.siscomfi.HelperMethods;
+import pe.pucp.edu.pe.siscomfi.Thining;
 
 public class Fingerprint {
 	private static int width;
@@ -321,9 +321,9 @@ public class Fingerprint {
 		try {
 			BufferedImage in = ImageIO.read(new File(filename1));
 			in = Thumbnails.of(in).size(600, 600).asBufferedImage();
-			BufferedImage bin = Binarizacion.binarize(in);
-			int[][] mati = Binarizacion.imgToMat(bin);
-			int[][] ske = thining1.doZhangSuenThinning(mati, false);
+			BufferedImage bin = Binarization.binarize(in);
+			int[][] mati = Binarization.imgToMat(bin);
+			int[][] ske = Thining.doZhangSuenThinning(mati, false);
 			List<Point> fMinutaes = Fingerprint.getMinutiaes(ske);
 			List<Point> tMinutaes = Fingerprint.removeFalseMinutae2(ske, fMinutaes);
 			double[][] grafoS = Fingerprint.matToGraph(tMinutaes);
@@ -342,17 +342,17 @@ public class Fingerprint {
 			BufferedImage test = ImageIO.read(new File(filename2));
 			test = Thumbnails.of(test).size(600, 600).asBufferedImage();
 
-			BufferedImage bin = Binarizacion.binarize(in);
-			BufferedImage binTest = Binarizacion.binarize(test);
+			BufferedImage bin = Binarization.binarize(in);
+			BufferedImage binTest = Binarization.binarize(test);
 
-			int[][] mati = Binarizacion.imgToMat(bin);
+			int[][] mati = Binarization.imgToMat(bin);
 			// int[][] matiF = Metodos.removeNoise(mati);
 
-			int[][] matiTest = Binarizacion.imgToMat(binTest);
+			int[][] matiTest = Binarization.imgToMat(binTest);
 			// int[][] matiTestF = Metodos.removeNoise(matiTest);
 
-			int[][] ske = thining1.doZhangSuenThinning(mati, false);
-			int[][] skeTest = thining1.doZhangSuenThinning(matiTest, false);
+			int[][] ske = Thining.doZhangSuenThinning(mati, false);
+			int[][] skeTest = Thining.doZhangSuenThinning(matiTest, false);
 
 			List<Point> fMinutaes = Fingerprint.getMinutiaes(ske);
 			List<Point> fMinutaesTest = Fingerprint.getMinutiaes(skeTest);

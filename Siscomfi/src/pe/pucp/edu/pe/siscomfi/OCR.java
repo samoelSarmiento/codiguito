@@ -57,7 +57,7 @@ public class OCR {
 				img = ImageIO.read(route);
 
 				// binarize
-				BufferedImage binImg = Binarizacion.binarize(img);
+				BufferedImage binImg = Binarization.binarize(img);
 
 				int[][] mati = new int[binImg.getWidth()][];
 				for (int x = 0; x < binImg.getWidth(); x++) {
@@ -68,7 +68,7 @@ public class OCR {
 				}
 
 				// skeletize
-				int skelImg[][] = thining1.doZhangSuenThinning(mati, false);
+				int skelImg[][] = Thining.doZhangSuenThinning(mati, false);
 
 				// vector
 				double vect[] = Aplastar(skelImg);

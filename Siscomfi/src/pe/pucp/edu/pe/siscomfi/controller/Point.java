@@ -7,7 +7,7 @@ public class Point implements Comparable<Point>{
 	private int y;
 	private int value;
 	private int type;
-	private int angle;
+	private double angle;
 	
 	public Point(int x, int y) {
 		this.x = x;
@@ -46,11 +46,11 @@ public class Point implements Comparable<Point>{
 		this.type = type;
 	}
 
-	public int getAngle() {
+	public double getAngle() {
 		return angle;
 	}
 
-	public void setAngle(int angle) {
+	public void setAngle(double angle) {
 		this.angle = angle;
 	}
 	
@@ -66,6 +66,11 @@ public class Point implements Comparable<Point>{
 		double x_2 = Math.pow(this.x - px.getX(), 2);
 		double y_2 = Math.pow(this.y - px.getY(), 2);
 		return Math.sqrt(x_2 + y_2);
-		
+	}
+	
+	public double getAnglePoint(Point px){
+		double dY = px.getY() - this.y;
+		double dX = px.getX() - this.x;
+		return Math.atan2(dY, dX);
 	}
 }
