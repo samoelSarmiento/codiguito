@@ -95,6 +95,7 @@ public class VistaPrincipal extends JFrame implements ActionListener{
 			}
 		}
 		
+		//Abre mantenimeino usuario
 		if(event.getSource() == mntmUsuario){
 			IfMntoUsuario ifUsuario = new IfMntoUsuario();
 			frmSiscomfi.add(ifUsuario);
