@@ -22,8 +22,9 @@ public class VistaPrincipal extends JFrame implements ActionListener{
 
 	private JFrame frmSiscomfi;
 	private JMenuItem mntmSalir;
-	JMenuItem mntmUsuario;
-	JMenuItem mntmPartidoPolitico;
+	private JMenuItem mntmUsuario;
+	private JMenuItem mntmPartidoPolitico;
+	private JMenuItem mntmReportePartidos;
 	/**
 	 * Launch the application.
 	 */
@@ -74,6 +75,9 @@ public class VistaPrincipal extends JFrame implements ActionListener{
 		JMenu mnReportes = new JMenu("Reportes");
 		menuBar.add(mnReportes);
 		
+		mntmReportePartidos = new JMenuItem("Reporte - Partidos");
+		mnReportes.add(mntmReportePartidos);
+		
 		JMenu mnSalir = new JMenu("Cerrar Sesi\u00F3n");
 		menuBar.add(mnSalir);
 		
@@ -84,7 +88,7 @@ public class VistaPrincipal extends JFrame implements ActionListener{
 		mntmSalir.addActionListener(this);
 		mntmPartidoPolitico.addActionListener(this);
 		mntmUsuario.addActionListener(this);
-		
+		mntmReportePartidos.addActionListener(this);
 	}
 
 	@Override
@@ -98,10 +102,14 @@ public class VistaPrincipal extends JFrame implements ActionListener{
 		//Abre mantenimeino usuario
 		if(event.getSource() == mntmUsuario){
 			IfMntoUsuario ifUsuario = new IfMntoUsuario();
-			frmSiscomfi.add(ifUsuario);
+			frmSiscomfi.getContentPane().add(ifUsuario);
 			ifUsuario.setVisible(true);
 		}
+		
+		if(event.getSource() == mntmReportePartidos){
+			IfReporte ifReporte = new IfReporte();
+			frmSiscomfi.getContentPane().add(ifReporte);
+			ifReporte.setVisible(true);
+		}
 	}
-	
-	
 }
