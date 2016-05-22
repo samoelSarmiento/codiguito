@@ -12,6 +12,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 
 import ij.measure.Calibration;
 
@@ -25,7 +27,7 @@ public class IfReporte extends JInternalFrame implements ActionListener{
 	private JButton btnGenerar;
 	private JButton btnExportar;
 	private JButton btnCancelar;
-	
+	private MyTableModel reporteModel;
 	/**
 	 * Launch the application.
 	 */
@@ -116,8 +118,11 @@ public class IfReporte extends JInternalFrame implements ActionListener{
 		pnTabla.add(spnTabla);
 		
 		tblReporte = new JTable();
-		spnTabla.setViewportView(tblReporte);
+		reporteModel = new MyTableModel();
+		tblReporte.setModel(reporteModel);
 		
+		spnTabla.setViewportView(tblReporte);
+				
 		btnExportar = new JButton("Exportar");
 		btnExportar.setBounds(34, 279, 89, 23);
 		getContentPane().add(btnExportar);
@@ -134,7 +139,33 @@ public class IfReporte extends JInternalFrame implements ActionListener{
 			this.dispose();
 		}
 		if (e.getSource() == btnGenerar){
+			String tipo = cmbTipo.getSelectedItem().toString();
+			String ubicacion = cmbUbicacion.getSelectedItem().toString();
+			String estadoP = cmbEstadoP.getSelectedItem().toString();
+			String fase = cmbFase.getSelectedItem().toString();
+			int anio = Integer.parseInt(cmbAnio.getSelectedItem().toString());
 			
 		}
+	}
+	
+	class MyTableModel extends DefaultTableModel{
+		
+		String titles[] = {"NOMBRE","REPRESENTANTE","ESTADO","PORC."};
+		@Override
+		public int getColumnCount() {
+			// TODO Auto-generated method stub
+			return titles.length;
+		}
+
+		public String getColumnName(int col){
+			return titles[col];
+		}		
+
+		@Override
+		public Object getValueAt(int arg0, int arg1) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
 	}
 }
