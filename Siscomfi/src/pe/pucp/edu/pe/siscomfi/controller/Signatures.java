@@ -91,14 +91,12 @@ public class Signatures {
 				break;
 			}
 		}
+		
 		double angle = p1.getAnglePoint(p2);
-		//System.out.println(Math.toDegrees(angle));
 		Point pFinal = p1;
-		if (angle > Math.PI / 2) {
-			angle -= Math.PI;
-			pFinal = p2;
-		}
-		pFinal.setAngle(angle);
+		pFinal.setAngle(angle - Math.PI/2);
+		//System.out.println("angle anterior: " + Math.toDegrees(angle));
+		//System.out.println("angle final: "+Math.toDegrees(pFinal.getAngle()));
 		return pFinal;
 	}
 
