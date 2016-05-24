@@ -2,24 +2,20 @@ package pe.pucp.edu.pe.siscomfi.controller;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import net.coobird.thumbnailator.Thumbnails;
 import pe.pucp.edu.pe.siscomfi.Binarization;
+import pe.pucp.edu.pe.siscomfi.HelperMethods;
 import pe.pucp.edu.pe.siscomfi.NoiseFilter;
 
 public class Signatures {
 
 	public static Rectangle getRectangularArea(BufferedImage img) {
-		// System.out.println("w: " + img.getWidth() + " h: " +
-		// img.getHeight());
-		// System.out.println(img.getRGB(0, 246));
 		Point top = null, left = null, right = null, bot = null;
 		for (int i = 0; i < img.getHeight(); i++) {
-			// System.out.println("i: "+i );
 			for (int j = 0; j < (img.getWidth()); j++) {
-				// System.out.println("j: "+ j);
 				if (img.getRGB(j, i) == Color.BLACK.getRGB()) {
 					top = new Point(i - 1, j);
 					break;
@@ -91,36 +87,62 @@ public class Signatures {
 				break;
 			}
 		}
-		
+
 		double angle = p1.getAnglePoint(p2);
 		Point pFinal = p1;
-		pFinal.setAngle(angle - Math.PI/2);
-		//System.out.println("angle anterior: " + Math.toDegrees(angle));
-		//System.out.println("angle final: "+Math.toDegrees(pFinal.getAngle()));
+		pFinal.setAngle(angle - Math.PI / 2);
+		// System.out.println("angle anterior: " + Math.toDegrees(angle));
+		// System.out.println("angle final:
+		// "+Math.toDegrees(pFinal.getAngle()));
 		return pFinal;
 	}
 
-	public static BufferedImage rotateImage2(BufferedImage img,Point pRot) {
-		BufferedImage img2 = new BufferedImage(img.getHeight(), img.getWidth(), img.getType());
-		for (int i = 0; i < img.getWidth(); i++) {
-			for (int j = 0; j < img.getHeight(); j++) {
-				Point pointRotated = rotatePoint(pRot,i,j,pRot.getAngle());
-				if(img.getRGB(i, j) == Color.BLACK.getRGB())
-					img2.setRGB(Math.abs(pointRotated.getX()), Math.abs(pointRotated.getY()), Color.BLACK.getRGB());
-				else
-					img2.setRGB(Math.abs(pointRotated.getX()), Math.abs(pointRotated.getY()), Color.WHITE.getRGB());
+	private static double compare(BufferedImage cDbimg, BufferedImage crop2) {
+		int m = 0, n = 0, p = 0, pixelColor, color;
+		int w = cDbimg.getWidth();
+		int h = cDbimg.getHeight();
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < h; j++) {
+				pixelColor = cDbimg.getRGB(i, j);
+				color = crop2.getRGB(i, j);
+				if (pixelColor == Color.BLACK.getRGB()) {
+					if (pixelColor == color)
+						m++;
+					else
+						n++;
+					p++;
+				}
 			}
 		}
-		return img2;
+		double comp =(m*1.0 / (n + p));
+		return comp;
 	}
 
-	private static Point rotatePoint(Point p, int x, int y, double angle) {
-		Point2D point = new Point2D.Double(p.getX(), p.getY());
-		Point2D result = new Point2D.Double();
-		AffineTransform rotation = new AffineTransform();
-		rotation.rotate(angle, x, y);
-		rotation.transform(point, result);
-		Point pointRotated = new Point((int) result.getX(), (int) result.getY());
-		return pointRotated;
+	public static double compareSignatures(BufferedImage original, BufferedImage suspect) throws IOException {
+		// original
+		original = Binarization.binarize(original);
+		Rectangle rDbimg = Signatures.getRectangularArea(original);
+		BufferedImage cDbimg = original.getSubimage((int) rDbimg.getY(), (int) rDbimg.getX(), (int) rDbimg.getHeight(),
+				(int) rDbimg.getWidth());
+		// suspect
+		suspect = Binarization.binarize(suspect);
+		Rectangle rec = Signatures.getRectangularArea(suspect);
+		// cortamos segun el rectangulo
+		BufferedImage crop = suspect.getSubimage((int) rec.getY(), (int) rec.getX(), (int) rec.getHeight(),
+				(int) rec.getWidth());
+		// saca el angulo de rotacion y rotamos
+		Point pRot = Signatures.getAngleImage(crop);
+		System.out.println(Math.toDegrees(pRot.getAngle()));
+		BufferedImage rot = crop;
+		if(Math.toDegrees(pRot.getAngle()) > 11)
+			 rot = HelperMethods.rotate(crop, pRot.getAngle());
+		// formamos el rectangulo denuevo
+		Rectangle rec2 = Signatures.getRectangularArea(rot);
+		BufferedImage crop2 = rot.getSubimage((int) rec2.getY(), (int) rec2.getX(), (int) rec2.getHeight(),
+				(int) rec2.getWidth());
+		// w,h
+		crop2 = Thumbnails.of(crop2).forceSize(cDbimg.getWidth(), cDbimg.getHeight()).asBufferedImage();
+		double res = compare(cDbimg, crop2);
+		return res;
 	}
 }
