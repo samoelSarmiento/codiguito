@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="C:/Users/samoel/workspace/Siscomfi/lib/thumbnailator-0.4.8.jar"/>
 	<classpathentry kind="lib" path="C:/Users/samoel/workspace/Siscomfi/lib/ij.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/neuroph"/>
+	<classpathentry kind="lib" path="C:/Users/samoel/Desktop/Dp1/codiguito/Siscomfi/lib/mysql-connector-java-5.1.35-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
