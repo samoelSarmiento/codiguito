@@ -24,6 +24,7 @@ import org.neuroph.util.TransferFunctionType;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.Prefs;
+import ij.plugin.Duplicator;
 import net.coobird.thumbnailator.Thumbnailator;
 import net.coobird.thumbnailator.Thumbnails;
 import pe.pucp.edu.pe.siscomfi.controller.Fingerprint;
@@ -38,38 +39,11 @@ public class Main {
 
 		// try {
 		ImagePlus img = IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\padron.jpg");
+		ImagePlus recortado = HelperMethods.recortarPlanillon(img);
+		recortado.show();
 		IJ.run(img, "Rotate 90 Degrees Right", "");
-		IJ.run(img, "Make Binary", "");
-		int y = 522, x = 0, r = 0, g, b;
-		while (r == 0) {
-			r = img.getPixel(x, y)[0];
-			x++;
-		}
-		img.setRoi(x + 1, 0, img.getWidth() - x, img.getHeight());
+		img.setRoi(img.getWidth() - recortado.getWidth(),0, recortado.getWidth(), recortado.getHeight());
 		IJ.run(img, "Crop", "");
-
-		y = img.getHeight();
-		System.out.println("antes: " + y);
-		x = 20; r= 0;
-		while (r == 0) {
-			r = img.getPixel(x, y)[0];
-			y--;
-		}
-		System.out.println("despues: " + y);
-		img.setRoi(0, 0, img.getWidth(), y);
-		IJ.run(img, "Crop", "");
-		
-		x = 20; r = 0; y = img.getHeight();
-		while (r != 0) {
-			r = img.getPixel(x, y)[0];
-			y--;
-		}
-		while (r == 0) {
-			r = img.getPixel(x, y)[0];
-			y--;
-		}
-		
-		int fila = img.getHeight() - y;
 		img.show();
 		/*
 		 * OCR ocr = new OCR(); //ocr.train(); DataSet trainingSet = null;

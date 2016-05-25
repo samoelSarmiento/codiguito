@@ -9,10 +9,37 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import ij.IJ;
+import ij.ImagePlus;
+import ij.plugin.Duplicator;
 import pe.pucp.edu.pe.siscomfi.controller.Point;
 
 public class HelperMethods {
 
+	public static ImagePlus recortarPlanillon(ImagePlus img){
+		ImagePlus planillon = new Duplicator().run(img);
+		IJ.run(planillon, "Rotate 90 Degrees Right", "");
+		IJ.run(planillon, "Make Binary", "");
+		int y = planillon.getHeight()/2, x = 0, r = 0, g, b;
+		while (r == 0) {
+			r = planillon.getPixel(x, y)[0];
+			x++;
+		}
+		planillon.setRoi(x + 1, 0, planillon.getWidth() - x, planillon.getHeight());
+		IJ.run(planillon, "Crop", "");
+		y = planillon.getHeight();
+		
+		x = 20; r= 0;
+		while (r == 0) {
+			r = planillon.getPixel(x, y)[0];
+			y--;
+		}
+		
+		planillon.setRoi(0, 0, planillon.getWidth(), y);
+		IJ.run(planillon, "Crop", "");
+		return planillon;
+	}
+	
 	public static void quickSort(Point[] arr, int low, int high, Point ref) {
 		if (arr == null || arr.length == 0)
 			return;
