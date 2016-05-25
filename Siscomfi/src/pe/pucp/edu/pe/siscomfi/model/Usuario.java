@@ -1,22 +1,31 @@
 package pe.pucp.edu.pe.siscomfi.model;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class Usuario {
-	int idUsuario;
-	String nombre;
-	String apellidoPaterno;
-	String apellidoMaterno;
-	String correoElectronico;
-	String contrasenia;
-	Date fechaRegistro;
-	RolUsuario rol;
+	private int idUsuario;
+	private String nombre;
+	private String apellidoPaterno;
+	private String apellidoMaterno;
+	private String correoElectronico;
+	private String contrasenia;
+	private Date fechaRegistro; //debe tener el formato YYYY-MM-DD
+	private String dni;
 	
-	public RolUsuario getRol() {
-		return rol;
+	
+	public String getDni() {
+		return dni;
 	}
-	public void setRol(RolUsuario rol) {
-		this.rol = rol;
+	public void setDni(String dni) {
+		this.dni = dni;
+	}
+	private int idRol;
+	
+	public int getIdRol() {
+		return idRol;
+	}
+	public void setIdRol(int rol) {
+		this.idRol = rol;
 	}
 	public int getIdUsuario() {
 		return idUsuario;

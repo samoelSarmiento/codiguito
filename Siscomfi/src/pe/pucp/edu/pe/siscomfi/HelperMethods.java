@@ -13,30 +13,6 @@ import pe.pucp.edu.pe.siscomfi.controller.Point;
 
 public class HelperMethods {
 
-	public static List<Point> VectorCaracteristicas(int[][] imagen) {
-		List<Point> caracteristicas = new ArrayList<Point>();
-		for (int i = 0; i < imagen.length; i++) {
-			for (int j = 0; j < imagen[0].length; j++) {
-				if (imagen[i][j] == 1) {
-					Point negro = new Point(i, j);
-					caracteristicas.add(negro);
-				}
-			}
-		}
-		return caracteristicas;
-	}
-
-	public static double[] Aplastar(int[][] matriz) {
-		double[] arreglo = new double[matriz.length * matriz[0].length];
-		int cont = 0;
-		for (int i = 0; i < matriz.length; i++) {
-			for (int j = 0; j < matriz[0].length; j++) {
-				arreglo[cont++] = matriz[i][j];
-			}
-		}
-		return arreglo;
-	}
-
 	public static void quickSort(Point[] arr, int low, int high, Point ref) {
 		if (arr == null || arr.length == 0)
 			return;
@@ -123,14 +99,5 @@ public class HelperMethods {
 	    GraphicsDevice gd = ge.getDefaultScreenDevice();
 	    return gd.getDefaultConfiguration();
 	}
-	
-	public double angle3Points(Point p1, Point p2, Point p3){
-		double p12 = p2.euclideanDistance(p1);
-		double p13 = p3.euclideanDistance(p1);
-		double p23 = p2.euclideanDistance(p3);
-		double pp12 = Math.pow(p12, 2);
-		double pp13 = Math.pow(p13, 2);
-		double pp23 = Math.pow(p23, 2);
-		return Math.acos((pp12 + pp13 - pp23)/(2*p12*p13));
-	}
+
 }

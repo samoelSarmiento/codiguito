@@ -71,30 +71,50 @@ public class Signatures {
 	}
 
 	public static Point getAngleImage(BufferedImage img) {
-		int y1 = 1;
-		Point p1 = null;
-		for (int i = img.getHeight() - 1; i >= 0; i--) {
-			if (img.getRGB(y1, i) == Color.BLACK.getRGB()) {
-				p1 = new Point(i, y1);
-				break;
-			}
-		}
-		int y2 = img.getWidth() - 1;
-		Point p2 = null;
-		for (int i = img.getHeight() - 1; i >= 0; i--) {
-			if (img.getRGB(y2, i) == Color.BLACK.getRGB()) {
-				p2 = new Point(i, y2);
-				break;
-			}
-		}
 
-		double angle = p1.getAnglePoint(p2);
-		Point pFinal = p1;
-		pFinal.setAngle(angle - Math.PI / 2);
+		double angleP = 0.0;
+		for (int w = 0; w < 5; w++) {
+			int y1 = 1 + 5 * w;
+			Point p1 = null;
+			for (int i = img.getHeight() - 1; i >= 0; i--) {
+				if (img.getRGB(y1, i) == Color.BLACK.getRGB()) {
+					p1 = new Point(i, y1);
+					break;
+				}
+			}
+			int y2 = img.getWidth() - 1 - 5 * w;
+			Point p2 = null;
+			for (int i = img.getHeight() - 1; i >= 0; i--) {
+				if (img.getRGB(y2, i) == Color.BLACK.getRGB()) {
+					p2 = new Point(i, y2);
+					break;
+				}
+			}
+
+			double angle = p1.getAnglePoint(p2) - (Math.PI / 2);
+			angleP += angle;
+			// pFinal = p1;
+			// pFinal.setAngle(angle - Math.PI / 2);
+		}
+		double angleFF = angleP/5;
+		Point pX = new Point(0,0);
+		pX.setAngle(angleFF);
+		return pX;
+		
+		  /*int y1 = 1; Point p1 = null; for (int i = img.getHeight() - 1; i >=
+		  0; i--) { if (img.getRGB(y1, i) == Color.BLACK.getRGB()) { p1 = new
+		  Point(i, y1); break; } } int y2 = img.getWidth() - 1; Point p2 =
+		  null; for (int i = img.getHeight() - 1; i >= 0; i--) { if
+		  (img.getRGB(y2, i) == Color.BLACK.getRGB()) { p2 = new Point(i, y2);
+		  break; } }
+		  
+		  double angle = p1.getAnglePoint(p2); Point pFinal = p1;
+		  pFinal.setAngle(angle - Math.PI / 2);
+		 return pFinal;*/
 		// System.out.println("angle anterior: " + Math.toDegrees(angle));
 		// System.out.println("angle final:
 		// "+Math.toDegrees(pFinal.getAngle()));
-		return pFinal;
+		
 	}
 
 	private static double compare(BufferedImage cDbimg, BufferedImage crop2) {
@@ -114,7 +134,7 @@ public class Signatures {
 				}
 			}
 		}
-		double comp =(m*1.0 / (n + p));
+		double comp = (m * 1.0 / (n + p));
 		return comp;
 	}
 
@@ -134,8 +154,10 @@ public class Signatures {
 		Point pRot = Signatures.getAngleImage(crop);
 		System.out.println(Math.toDegrees(pRot.getAngle()));
 		BufferedImage rot = crop;
-		if(Math.toDegrees(pRot.getAngle()) > 11)
-			 rot = HelperMethods.rotate(crop, pRot.getAngle());
+		if (Math.toDegrees(pRot.getAngle()) > 11)
+			rot = HelperMethods.rotate(crop, pRot.getAngle());
+		if (Math.toDegrees(pRot.getAngle()) < 0)
+			rot = HelperMethods.rotate(crop, pRot.getAngle());
 		// formamos el rectangulo denuevo
 		Rectangle rec2 = Signatures.getRectangularArea(rot);
 		BufferedImage crop2 = rot.getSubimage((int) rec2.getY(), (int) rec2.getX(), (int) rec2.getHeight(),

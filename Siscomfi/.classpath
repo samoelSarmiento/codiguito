@@ -2,9 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="C:/Users/samoel/Downloads/ij150/ImageJ/ij.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/neuroph"/>
 	<classpathentry kind="lib" path="C:/Users/samoel/workspace/Siscomfi/lib/thumbnailator-0.4.8.jar"/>
-	<classpathentry kind="lib" path="C:/Users/samoel/workspace/Siscomfi/lib/jgrapht-core-0.9.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/samoel/workspace/Siscomfi/lib/ij.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

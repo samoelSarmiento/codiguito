@@ -155,22 +155,6 @@ public class Fingerprint {
 		return Math.atan2(y.getY() - x.getY(), y.getX() - x.getX());
 	}
 
-	public Rotation calcRotation(List<Point> source, List<Point> dest) {
-		Point[] p1 = maxPoints(source);
-		Point[] p2 = maxPoints(dest);
-
-		int tras_x = p1[0].getX() - p2[0].getX();
-		int tras_y = p1[0].getY() - p2[0].getY();
-
-		double angleS = angle(p1[0], p1[1]);
-		double angleD = angle(p2[0], p2[1]);
-
-		double angleRot = (angleS > angleD) ? angleS - angleD : angleD - angleS;
-
-		return new Rotation(new Point(tras_x, tras_y), angleRot);
-
-	}
-
 	public static List<Point> removeFalseMinutae(int[][] skelMat, List<Point> fullMin) {
 		double inter_D = 0;
 		int rows_lenght = skelMat[0].length;
@@ -346,11 +330,8 @@ public class Fingerprint {
 			BufferedImage binTest = Binarization.binarize(test);
 
 			int[][] mati = Binarization.imgToMat(bin);
-			// int[][] matiF = Metodos.removeNoise(mati);
-
 			int[][] matiTest = Binarization.imgToMat(binTest);
-			// int[][] matiTestF = Metodos.removeNoise(matiTest);
-
+			
 			int[][] ske = Thining.doZhangSuenThinning(mati, false);
 			int[][] skeTest = Thining.doZhangSuenThinning(matiTest, false);
 
