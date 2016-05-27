@@ -81,7 +81,7 @@ public class VistaLogin implements ActionListener{
 		frmSiscomfi.getContentPane().add(pnLogo);
 		
 		*/
-		JLabel lblUsuario = new JLabel("Usuario:");
+		JLabel lblUsuario = new JLabel("Correo:");
 		lblUsuario.setBounds(197, 51, 86, 14);
 		frmSiscomfi.getContentPane().add(lblUsuario);
 		
@@ -113,11 +113,9 @@ public class VistaLogin implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if(event.getSource() == btnIngresar){
-			//frmSiscomfi.setVisible(false);
 			frmSiscomfi.dispose();
 			vMenu = new VistaMenu();
 			vMenu.setVisible(true);
-			
 		}
 	}
 	

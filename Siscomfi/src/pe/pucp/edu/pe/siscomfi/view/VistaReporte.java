@@ -18,11 +18,11 @@ import javax.swing.table.DefaultTableModel;
 
 public class VistaReporte extends JInternalFrame implements ActionListener{
 	private JTable tblReporte;
-	private JComboBox cmbTipo;
-	private JComboBox cmbFase;
-	private JComboBox cmbUbicacion;
-	private JComboBox cmbAnio;
-	private JComboBox cmbEstadoP;
+	private JComboBox<String> cmbTipo;
+	private JComboBox<String> cmbFase;
+	private JComboBox<String> cmbUbicacion;
+	private JComboBox<String> cmbAnio;
+	private JComboBox<String> cmbEstadoP;
 	private JButton btnGenerar;
 	private JButton btnExportar;
 	private JButton btnCancelar;
@@ -54,7 +54,7 @@ public class VistaReporte extends JInternalFrame implements ActionListener{
 		lblUbicacin.setBounds(264, 40, 73, 14);
 		getContentPane().add(lblUbicacin);
 		
-		cmbTipo = new JComboBox();
+		cmbTipo = new JComboBox<String>();
 		cmbTipo.addItem("Nacional");
 		cmbTipo.addItem("Regional");
 		cmbTipo.addItem("Municipal");
@@ -62,7 +62,7 @@ public class VistaReporte extends JInternalFrame implements ActionListener{
 		cmbTipo.setBounds(121, 8, 104, 20);
 		getContentPane().add(cmbTipo);
 		
-		cmbAnio = new JComboBox();
+		cmbAnio = new JComboBox<String>();
 		Calendar c = Calendar.getInstance();
 		int anio = c.get(Calendar.YEAR);
 		for(int i = anio - 10; i <= anio + 20;i++){
@@ -71,17 +71,17 @@ public class VistaReporte extends JInternalFrame implements ActionListener{
 		cmbAnio.setBounds(121, 37, 104, 20);
 		getContentPane().add(cmbAnio);
 		
-		cmbEstadoP = new JComboBox();
+		cmbEstadoP = new JComboBox<String>();
 		cmbEstadoP.setBounds(121, 68, 104, 20);
 		getContentPane().add(cmbEstadoP);
 		
-		cmbFase = new JComboBox();
+		cmbFase = new JComboBox<String>();
 		cmbFase.addItem("Fase 1");
 		cmbFase.addItem("Fase 2");
 		cmbFase.setBounds(328, 8, 104, 20);
 		getContentPane().add(cmbFase);
 		
-		cmbUbicacion = new JComboBox();
+		cmbUbicacion = new JComboBox<String>();
 		cmbUbicacion.setBounds(328, 37, 104, 20);
 		getContentPane().add(cmbUbicacion);
 		

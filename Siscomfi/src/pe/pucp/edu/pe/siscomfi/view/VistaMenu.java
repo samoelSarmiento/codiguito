@@ -23,26 +23,11 @@ public class VistaMenu extends JFrame {
 	private VistaObservados vObservados;
 	
 	private VistaReporte vReportePartido;
-	private VistaRegistrarUsuario vRegistrarUsuario;
+	private VistaMantenimientoUsuario vMtnmUsuario;
 	private VistaIniciarProceso vProcesar;
 	private VistaRegistrarProceso vRegistrarProceso;
 	
 	private VistaMenu me = this;
-	
-	/*
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VistaMenu frame = new VistaMenu();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	*/
 	
 	public VistaMenu() {
 		setTitle("SISCOMFI");
@@ -107,9 +92,9 @@ public class VistaMenu extends JFrame {
 		JMenuItem mntmRegistrarUsuario = new JMenuItem("Registrar usuario");
 		mntmRegistrarUsuario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				vRegistrarUsuario = new VistaRegistrarUsuario();
-				desktop.add(vRegistrarUsuario);
-				vRegistrarUsuario.setVisible(true);
+				vMtnmUsuario = new VistaMantenimientoUsuario();
+				desktop.add(vMtnmUsuario);
+				vMtnmUsuario.setVisible(true);
 				
 			}
 		});

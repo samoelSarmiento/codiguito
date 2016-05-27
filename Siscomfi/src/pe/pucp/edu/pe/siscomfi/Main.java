@@ -33,52 +33,43 @@ import pe.pucp.edu.pe.siscomfi.controller.Signatures;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		BufferedImage in = null;
 		BufferedImage dbimg = null;
 
-		// try {
-		ImagePlus img = IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\padron.jpg");
-		ImagePlus recortado = HelperMethods.recortarPlanillon(img);
-		recortado.show();
-		IJ.run(img, "Rotate 90 Degrees Right", "");
-		img.setRoi(img.getWidth() - recortado.getWidth(),0, recortado.getWidth(), recortado.getHeight());
-		IJ.run(img, "Crop", "");
-		img.show();
 		/*
-		 * OCR ocr = new OCR(); //ocr.train(); DataSet trainingSet = null;
-		 * //trainingSet.save(
-		 * "C:\\Users\\samoel\\Desktop\\TestImage\\prep\\tset.data");
-		 * //trainingSet.saveAsTxt(
-		 * "C:\\Users\\samoel\\Desktop\\TestImage\\prep\\tset.txt", ",");
-		 * //String tstring = trainingSet.toCSV(); //PrintWriter out = new
-		 * PrintWriter(
-		 * "C:\\Users\\samoel\\Desktop\\TestImage\\prep\\tset2.data");
-		 * //out.println(tstring); //out.close(); trainingSet = DataSet.load(
-		 * "C:\\Users\\samoel\\Desktop\\TestImage\\prep\\tset.data");
-		 * //trainingSet = DataSet.createFromFile(
-		 * "C:\\Users\\samoel\\Desktop\\TestImage\\prep\\tset.txt", 10000, 784,
-		 * " "); //trainingSet = DataSet.createFromFile(filePath, 10000, 784,
-		 * " "); NeuralNetwork neuralNetwork = new
-		 * MultiLayerPerceptron(TransferFunctionType.SIGMOID, 784, 784, 4);
-		 * BackPropagation backPropagation = new BackPropagation();
-		 * backPropagation.setMaxIterations(10);
-		 * neuralNetwork.learn(trainingSet, backPropagation);
+		 * // try { /*ImagePlus img =
+		 * IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\padron.jpg");
+		 * ImagePlus recortado = HelperMethods.recortarPlanillon(img);
 		 * 
 		 * 
-		 * for(int i = 1 ; i <25;i++){ BufferedImage test = ImageIO.read(new
-		 * File("C:\\Users\\samoel\\Desktop\\TestImage\\test\\p"+i+".jpg"));
-		 * test = OCR.resizeImage(test, 28, 28, test.getType()); test =
-		 * Binarization.binarize(test); int [][] matTest =
-		 * Binarization.imgToMat(test); double testVect[] =
-		 * ocr.aplastar(matTest); neuralNetwork.setInput(testVect);// vect de
-		 * una imagen esperada neuralNetwork.calculate();
-		 * 
-		 * System.out.println("imagen: " + i +" result number: " +
-		 * (neuralNetwork.getOutput()[0]) + " " + neuralNetwork.getOutput()[1] +
-		 * " " + neuralNetwork.getOutput()[2] + " " +
-		 * neuralNetwork.getOutput()[3]); }
+		 * IJ.run(img, "Rotate 90 Degrees Right", ""); img.setRoi(img.getWidth()
+		 * - recortado.getWidth(),0, recortado.getWidth(),
+		 * recortado.getHeight()); IJ.run(img, "Crop", ""); img.show();
 		 */
+
+		//OCR ocr = new OCR();
+		DataSet trainingSet = null;
+		// trainingSet.save("C:\\Users\\samoel\\Desktop\\TestImage\\prep\\tset.data");
+		trainingSet = DataSet.load("C:\\Users\\samoel\\Desktop\\TestImage\\prep\\tset.data");
+		NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 784, 784, 4);
+		BackPropagation backPropagation = new BackPropagation();
+		backPropagation.setMaxIterations(10);
+		//neuralNetwork.learn(trainingSet, backPropagation);
+		
+		/*for (int i = 1; i < 25; i++) {
+			BufferedImage test = ImageIO.read(new File("C:\\Users\\samoel\\Desktop\\TestImage\\test\\p" + i + ".jpg"));
+			test = OCR.resizeImage(test, 28, 28, test.getType());
+			test = Binarization.binarize(test);
+			int[][] matTest = Binarization.imgToMat(test);
+			double testVect[] = OCR.aplastar(matTest);
+			neuralNetwork.setInput(testVect);// vect de una imagen esperada
+			neuralNetwork.calculate();
+
+			System.out.println("imagen: " + i + " result number: " + (neuralNetwork.getOutput()[0]) + " "
+					+ neuralNetwork.getOutput()[1] + " " + neuralNetwork.getOutput()[2] + " "
+					+ neuralNetwork.getOutput()[3]);
+		}*/
 
 		/*
 		 * String file = "C:/Users/samoel/Desktop/TestImage/ff3.jpg"; in =

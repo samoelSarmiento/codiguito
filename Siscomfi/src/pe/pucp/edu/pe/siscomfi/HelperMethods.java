@@ -18,7 +18,7 @@ public class HelperMethods {
 
 	public static ImagePlus recortarPlanillon(ImagePlus img){
 		ImagePlus planillon = new Duplicator().run(img);
-		IJ.run(planillon, "Rotate 90 Degrees Right", "");
+		//IJ.run(planillon, "Rotate 90 Degrees Right", "");
 		IJ.run(planillon, "Make Binary", "");
 		int y = planillon.getHeight()/2, x = 0, r = 0, g, b;
 		while (r == 0) {

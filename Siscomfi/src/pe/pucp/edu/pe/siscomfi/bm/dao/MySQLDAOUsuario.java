@@ -16,63 +16,108 @@ public class MySQLDAOUsuario implements DAOUsuario {
 
 	@Override
 	public void add(Usuario u) {
-					
 		Connection conn = null;
-		PreparedStatement pstmt = null;		
+		PreparedStatement pstmt = null;
 		try {
-			//Paso 1: Registrar el Driver
 			DriverManager.registerDriver(new Driver());
-			
-			//Paso 2: Obtener la conexión
-			conn = DriverManager.getConnection(DBConnection.URL_JDBC_MySQL,
-								DBConnection.user,
-								DBConnection.password);
-			
-			//Paso 3: Preparar la sentencia
-			String sql =  "INSERT INTO Usuario "
+			conn = DriverManager.getConnection(DBConnection.URL_JDBC_MySQL, DBConnection.user, DBConnection.password);
+
+			String sql = "INSERT INTO Usuario "
 					+ "(nombre, apellidoPaterno, apellidoMaterno,   correoElectronico, contrasenia, fechaRegistro,   dni, idRol)"
-					+ "VALUES (?,?,?,  ?,'1234',Now(),  ?,?)";
+					+ "VALUES (?,?,?,?,'1234',Now(),?,?)";
+
 			pstmt = conn.prepareStatement(sql);
-			
-			//pstmt.setInt(1, p.getId());
 			pstmt.setString(1, u.getNombre());
 			pstmt.setString(2, u.getApellidoPaterno());
 			pstmt.setString(3, u.getApellidoPaterno());
-			
 			pstmt.setString(4, u.getCorreoElectronico());
-			//pstmt.setString(5, u.getContrasenia());
-			
-			//pstmt.setDate(6, u.getFechaRegistro()); // estoy declarandole un date de tipo SQL
-			
 			pstmt.setString(5, u.getDni());
 			pstmt.setInt(6, u.getIdRol());
-			
-			//Paso 4: Ejecutar la sentencia
 			pstmt.executeUpdate();
-			//Paso 5(opc.): Procesar los resultados			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			//Paso 6(OJO): Cerrar la conexión
-			try { if (pstmt!= null) pstmt.close();} 
-				catch (Exception e){e.printStackTrace();};
-			try { if (conn!= null) conn.close();} 
-				catch (Exception e){e.printStackTrace();};						
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-		
 	}
 
 	@Override
 	public void update(Usuario u) {
-		// TODO Auto-generated method stub
-		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			DriverManager.registerDriver(new Driver());
+			conn = DriverManager.getConnection(DBConnection.URL_JDBC_MySQL, DBConnection.user, DBConnection.password);
+
+			String sql = "UPDATE Usuario "
+					+ "SET nombre = ?, apellidoPaterno = ?, apellidoMaterno = ?,   correoElectronico = ?, dni = ?, idRol = ?"
+					+ "WHERE id = ?";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, u.getNombre());
+			pstmt.setString(2, u.getApellidoPaterno());
+			pstmt.setString(3, u.getApellidoPaterno());
+			pstmt.setString(4, u.getCorreoElectronico());
+			pstmt.setString(5, u.getDni());
+			pstmt.setInt(6, u.getIdRol());
+			pstmt.setInt(7, u.getIdUsuario());
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
 	public void delete(int idUsuario) {
-		// TODO Auto-generated method stub
-		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			DriverManager.registerDriver(new Driver());
+			conn = DriverManager.getConnection(DBConnection.URL_JDBC_MySQL, DBConnection.user, DBConnection.password);
+			String sql = "DELETE FROM Usuario WHERE id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(7, idUsuario);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
