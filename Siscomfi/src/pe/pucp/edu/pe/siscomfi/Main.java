@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -110,22 +113,31 @@ public class Main {
 		List<MinutaePoint> c2I = Fingerprint.compareMinutaePoint2(mpInputImage, mpBaseImage);
 		Point[] cordOrdBase = new Point[c2B.size()];
 		Point[] cordOrdInput = new Point[c2I.size()];
-		
+		//base
 		int cont = 0;
 		for (MinutaePoint point : c2B) {
 			cordOrdBase[cont++] = point.getCord();
-			
 		}
-		//HelperMethods.quickSort(cordOrdBase, 0, cordOrdBase.length-1, cordOrdBase[0]);
+		Point[] arrAux = new Point[cordOrdBase.length-1];
+		for(int i = 1 ; i < cordOrdBase.length;i++)
+			arrAux[i-1] = cordOrdBase[i];
+		Arrays.sort(arrAux);
+		for(int i = 0 ; i < arrAux.length;i++)
+			cordOrdBase[i+1] = arrAux[i];
 		for(Point point : cordOrdBase){
 			System.out.println("Base : x = " + point.getX() + " y = " + point.getY());
 		}
+		//input		
 		cont = 0;
 		for (MinutaePoint point : c2I) {
 			cordOrdInput[cont++] = point.getCord();
-			
 		}
-		//HelperMethods.quickSort(cordOrdInput, 0, cordOrdInput.length-1, cordOrdInput[0]);
+		Point[] arrAux2 = new Point[cordOrdInput.length-1];
+		for(int i = 1 ; i < cordOrdInput.length;i++)
+			arrAux2[i-1] = cordOrdInput[i];
+		Arrays.sort(arrAux2);
+		for(int i = 0 ; i < arrAux2.length;i++)
+			cordOrdInput[i+1] = arrAux2[i];
 		for(Point point : cordOrdInput){
 			System.out.println("Input : x = " + point.getX() + " y = " + point.getY());
 		}
