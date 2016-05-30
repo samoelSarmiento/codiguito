@@ -39,7 +39,7 @@ public class VistaMantenimientoUsuario extends JInternalFrame implements ActionL
 		setTitle("Mantenimiento de Usuarios");
 		setClosable(true);
 		getContentPane().setLayout(null);
-
+		
 		JLabel lblNombre = new JLabel("Nombre:");
 		lblNombre.setBounds(10, 42, 112, 14);
 		getContentPane().add(lblNombre);

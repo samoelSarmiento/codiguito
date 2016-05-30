@@ -4,9 +4,18 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+
+import org.encog.engine.network.activation.ActivationElliott;
+import org.encog.ml.data.MLData;
+import org.encog.ml.data.MLDataPair;
+import org.encog.ml.data.MLDataSet;
+import org.encog.neural.data.NeuralDataSet;
+import org.encog.neural.networks.BasicNetwork;
+import org.encog.neural.networks.layers.BasicLayer;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
@@ -18,6 +27,23 @@ import net.coobird.thumbnailator.Thumbnails;
 
 public class OCR {
 	public static DataSet tSet;
+
+	public static double[] imgToDouble(BufferedImage img) {
+		double[][] mati = new double[img.getWidth()][];
+		for (int x = 0; x < img.getWidth(); x++) {
+			mati[x] = new double[img.getHeight()];
+			for (int y = 0; y < img.getHeight(); y++) {
+				mati[x][y] = (byte) (img.getRGB(x, y) == 0xFFFFFFFF ? 0.0 : 1.0);
+			}
+		}
+		double[] matF = new double[mati.length * mati[0].length];
+		int cont = 0;
+		for (int i = 0; i < mati.length; i++)
+			for (int j = 0; j < mati[0].length; j++)
+				matF[cont++] = mati[i][j];
+		return matF;
+
+	}
 
 	public static double[] aplastar(int[][] matriz) {
 		double[] arreglo = new double[matriz.length * matriz[0].length];
@@ -45,6 +71,16 @@ public class OCR {
 			res[i] = arr[i] * 1.0;
 		}
 		return res;
+	}
+
+	public static void trainE() throws IOException {
+		BasicNetwork network = new BasicNetwork();
+		network.addLayer(new BasicLayer(null, true, 784));
+		network.addLayer(new BasicLayer(new ActivationElliott(), true, 784));
+		network.addLayer(new BasicLayer(new ActivationElliott(), true, 4));
+		network.getStructure().finalizeStructure();
+		network.reset();
+
 	}
 
 	public static void train() throws IOException {

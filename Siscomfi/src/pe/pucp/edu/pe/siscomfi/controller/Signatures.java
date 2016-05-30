@@ -5,10 +5,13 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import ij.IJ;
+import ij.ImagePlus;
 import net.coobird.thumbnailator.Thumbnails;
 import pe.pucp.edu.pe.siscomfi.Binarization;
 import pe.pucp.edu.pe.siscomfi.HelperMethods;
 import pe.pucp.edu.pe.siscomfi.NoiseFilter;
+import pe.pucp.edu.pe.siscomfi.OCR;
 
 public class Signatures {
 
@@ -140,12 +143,17 @@ public class Signatures {
 
 	public static double compareSignatures(BufferedImage original, BufferedImage suspect) throws IOException {
 		// original
-		original = Binarization.binarize(original);
+		ImagePlus impOriginal = new ImagePlus("", original);
+		IJ.run(impOriginal, "Make Binary", "");
+		original = impOriginal.getBufferedImage();
 		Rectangle rDbimg = Signatures.getRectangularArea(original);
 		BufferedImage cDbimg = original.getSubimage((int) rDbimg.getY(), (int) rDbimg.getX(), (int) rDbimg.getHeight(),
 				(int) rDbimg.getWidth());
 		// suspect
-		suspect = Binarization.binarize(suspect);
+		ImagePlus impSuspect = new ImagePlus("", suspect);
+		IJ.run(impSuspect, "Make Binary", "");
+		
+		suspect = impSuspect.getBufferedImage();
 		Rectangle rec = Signatures.getRectangularArea(suspect);
 		// cortamos segun el rectangulo
 		BufferedImage crop = suspect.getSubimage((int) rec.getY(), (int) rec.getX(), (int) rec.getHeight(),
@@ -163,7 +171,7 @@ public class Signatures {
 		BufferedImage crop2 = rot.getSubimage((int) rec2.getY(), (int) rec2.getX(), (int) rec2.getHeight(),
 				(int) rec2.getWidth());
 		// w,h
-		crop2 = Thumbnails.of(crop2).forceSize(cDbimg.getWidth(), cDbimg.getHeight()).asBufferedImage();
+		crop2 = OCR.resizeImage(crop2, crop2.getWidth(), crop2.getHeight(), crop2.getType());
 		double res = compare(cDbimg, crop2);
 		return res;
 	}

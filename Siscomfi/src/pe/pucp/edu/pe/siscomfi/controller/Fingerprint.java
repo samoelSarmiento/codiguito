@@ -12,13 +12,124 @@ import javax.imageio.ImageIO;
 
 import net.coobird.thumbnailator.Thumbnails;
 import pe.pucp.edu.pe.siscomfi.Binarization;
+import pe.pucp.edu.pe.siscomfi.CcpMinutaes;
 import pe.pucp.edu.pe.siscomfi.HelperMethods;
+import pe.pucp.edu.pe.siscomfi.MinutaePoint;
+import pe.pucp.edu.pe.siscomfi.MinutaeTuple;
 import pe.pucp.edu.pe.siscomfi.Thining;
 
 public class Fingerprint {
 	private static int width;
 	private static int height;
-	private static int k = 5;
+	private static int k = 6;
+
+	private static double mayor(double m, double n) {
+		if (m > n)
+			return m;
+		return n;
+	}
+
+	private static double menor(double m, double n) {
+		if (m < n)
+			return m;
+		return n;
+	}
+
+	private static double getRatio(Point a, Point b, Point c) {
+		double pAC = a.euclideanDistance(c);
+		double pAB = a.euclideanDistance(b);
+		double ratio = mayor(pAC, pAB) / menor(pAC, pAB);
+		return ratio;
+	}
+
+	public static MinutaePoint getMinutaePoint(Point i, Point[] vecinos) {
+		List<MinutaeTuple> tuples = new ArrayList<MinutaeTuple>();
+		tuples.add(new MinutaeTuple(getRatio(i, vecinos[1], vecinos[2]),
+				HelperMethods.getAngle3Point(i, vecinos[1], vecinos[2])));
+
+		tuples.add(new MinutaeTuple(getRatio(i, vecinos[1], vecinos[3]),
+				HelperMethods.getAngle3Point(i, vecinos[1], vecinos[3])));
+
+		tuples.add(new MinutaeTuple(getRatio(i, vecinos[1], vecinos[4]),
+				HelperMethods.getAngle3Point(i, vecinos[1], vecinos[4])));
+
+		tuples.add(new MinutaeTuple(getRatio(i, vecinos[1], vecinos[5]),
+				HelperMethods.getAngle3Point(i, vecinos[1], vecinos[5])));
+
+		tuples.add(new MinutaeTuple(getRatio(i, vecinos[2], vecinos[3]),
+				HelperMethods.getAngle3Point(i, vecinos[2], vecinos[3])));
+
+		tuples.add(new MinutaeTuple(getRatio(i, vecinos[2], vecinos[4]),
+				HelperMethods.getAngle3Point(i, vecinos[2], vecinos[4])));
+
+		tuples.add(new MinutaeTuple(getRatio(i, vecinos[2], vecinos[5]),
+				HelperMethods.getAngle3Point(i, vecinos[2], vecinos[5])));
+
+		tuples.add(new MinutaeTuple(getRatio(i, vecinos[3], vecinos[4]),
+				HelperMethods.getAngle3Point(i, vecinos[3], vecinos[4])));
+
+		tuples.add(new MinutaeTuple(getRatio(i, vecinos[3], vecinos[5]),
+				HelperMethods.getAngle3Point(i, vecinos[3], vecinos[5])));
+
+		tuples.add(new MinutaeTuple(getRatio(i, vecinos[4], vecinos[5]),
+				HelperMethods.getAngle3Point(i, vecinos[3], vecinos[4])));
+		return new MinutaePoint(i, tuples);
+	}
+
+	private static boolean compareTuples(List<MinutaeTuple> base, List<MinutaeTuple> input) {
+		int comp = 0;
+		for (MinutaeTuple mtBase : base) {
+			for (MinutaeTuple mtInput : input) {
+				boolean mRatio = mtBase.getRatio() == mtInput.getRatio() ;
+				boolean mAngle = Math.abs(mtBase.getAngle() - mtInput.getAngle()) <= 3.5;
+				if (mRatio && mAngle)
+					comp++;
+				if (comp == 2)
+					return true;
+			}
+		}
+		return false;
+	}
+	public static List<MinutaePoint> compareMinutaePoint2(List<MinutaePoint> base, List<MinutaePoint> input) {
+		List<MinutaePoint> ccpBase = new ArrayList<MinutaePoint>();
+		boolean arrBool[] = new boolean[input.size()];
+		for (MinutaePoint mpBase : base) {
+			List<MinutaeTuple> mtBase = mpBase.getTuples();
+			for (int i = 0; i < input.size(); i++) {
+				if (!arrBool[i]) {
+					MinutaePoint mpInput = input.get(i);
+					boolean resultado = compareTuples(mtBase, mpInput.getTuples());
+					if (resultado) {
+						ccpBase.add(mpBase);
+						arrBool[i] = true;
+						break;
+					}
+				}
+			}
+		}
+		return ccpBase;
+	}
+	public static CcpMinutaes compareMinutaePoint(List<MinutaePoint> base, List<MinutaePoint> input) {
+		List<MinutaePoint> ccpBase = new ArrayList<MinutaePoint>();
+		List<MinutaePoint> ccpInput = new ArrayList<MinutaePoint>();
+		boolean arrBool[] = new boolean[input.size()];
+		for (MinutaePoint mpBase : base) {
+			List<MinutaeTuple> mtBase = mpBase.getTuples();
+			for (int i = 0; i < input.size(); i++) {
+				if (!arrBool[i]) {
+					MinutaePoint mpInput = input.get(i);
+					boolean resultado = compareTuples(mtBase, mpInput.getTuples());
+					if (resultado) {
+						ccpBase.add(mpBase);
+						ccpInput.add(mpInput);
+						arrBool[i] = true;
+						break;
+					}
+				}
+			}
+		}
+		return new CcpMinutaes(ccpBase, ccpInput);
+	}
 
 	// return the crossing number of the 3x3 matrix
 	public static int CrossingNumber(int[][] CNMatrix) {
@@ -317,7 +428,7 @@ public class Fingerprint {
 		}
 		return null;
 	}
-	
+
 	public static double matchFingerprints(String filename1, String filename2) {
 		try {
 			BufferedImage in = ImageIO.read(new File(filename1));
@@ -331,7 +442,7 @@ public class Fingerprint {
 
 			int[][] mati = Binarization.imgToMat(bin);
 			int[][] matiTest = Binarization.imgToMat(binTest);
-			
+
 			int[][] ske = Thining.doZhangSuenThinning(mati, false);
 			int[][] skeTest = Thining.doZhangSuenThinning(matiTest, false);
 

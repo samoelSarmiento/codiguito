@@ -2,11 +2,15 @@ package pe.pucp.edu.pe.siscomfi;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -15,10 +19,23 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.encog.engine.network.activation.ActivationElliott;
+import org.encog.ml.data.MLData;
+import org.encog.ml.data.MLDataSet;
+import org.encog.ml.data.basic.BasicMLData;
+import org.encog.ml.data.basic.BasicMLDataSet;
+import org.encog.ml.data.buffer.MemoryDataLoader;
+import org.encog.neural.networks.BasicNetwork;
+import org.encog.neural.networks.layers.BasicLayer;
+import org.encog.neural.networks.training.propagation.Propagation;
+import org.encog.neural.networks.training.propagation.resilient.*;
+import org.encog.platformspecific.j2se.data.image.ImageMLData;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
+import org.neuroph.nnet.learning.ResilientPropagation;
+
 import org.neuroph.util.TransferFunctionType;
 
 import ij.IJ;
@@ -30,46 +47,166 @@ import net.coobird.thumbnailator.Thumbnails;
 import pe.pucp.edu.pe.siscomfi.controller.Fingerprint;
 import pe.pucp.edu.pe.siscomfi.controller.Point;
 import pe.pucp.edu.pe.siscomfi.controller.Signatures;
+import sourceafis.simple.AfisEngine;
+import sourceafis.simple.Person;
 
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		BufferedImage in = null;
-		BufferedImage dbimg = null;
 
 		/*
-		 * // try { /*ImagePlus img =
-		 * IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\padron.jpg");
-		 * ImagePlus recortado = HelperMethods.recortarPlanillon(img);
-		 * 
-		 * 
-		 * IJ.run(img, "Rotate 90 Degrees Right", ""); img.setRoi(img.getWidth()
-		 * - recortado.getWidth(),0, recortado.getWidth(),
-		 * recortado.getHeight()); IJ.run(img, "Crop", ""); img.show();
+		 * CARGAR OCR - COMPARAR OcrFinal ocr = new OcrFinal();
+		 * ocr.load_actionPerformed(); ocr.trainSOM(); for (int i = 1; i < 25;
+		 * i++) { ImagePlus imp =
+		 * IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\test\\p" + i +
+		 * ".JPG"); IJ.run(imp, "Make Binary", ""); //imp.show(); BufferedImage
+		 * img = imp.getBufferedImage(); System.out.print("resultado de p" + i +
+		 * ": "); ocr.recognize_actionPerformed(img); }
 		 */
 
-		//OCR ocr = new OCR();
-		DataSet trainingSet = null;
-		// trainingSet.save("C:\\Users\\samoel\\Desktop\\TestImage\\prep\\tset.data");
-		trainingSet = DataSet.load("C:\\Users\\samoel\\Desktop\\TestImage\\prep\\tset.data");
-		NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 784, 784, 4);
-		BackPropagation backPropagation = new BackPropagation();
-		backPropagation.setMaxIterations(10);
-		//neuralNetwork.learn(trainingSet, backPropagation);
+		/*
+		 * PARTE PARA CORTAR PLANILLON ImagePlus img = IJ.openImage(
+		 * "C:\\Users\\samoel\\Desktop\\TestImage\\padron\\padron3.jpg");
+		 * ImagePlus recortado = HelperMethods.recortarPlanillon(img,img);
+		 * ImagePlus recortadoOriginal = new Duplicator().run(recortado);
+		 * 
+		 * List<ImagePlus> lista = HelperMethods.getFilasPlanillon(recortado);
+		 * 
+		 * List<ImagePlus> parteLista =
+		 * HelperMethods.getPartesFila(lista.get(1), recortadoOriginal);
+		 * for(ImagePlus mm : parteLista){ mm.show(); }
+		 */
 		
-		/*for (int i = 1; i < 25; i++) {
-			BufferedImage test = ImageIO.read(new File("C:\\Users\\samoel\\Desktop\\TestImage\\test\\p" + i + ".jpg"));
-			test = OCR.resizeImage(test, 28, 28, test.getType());
-			test = Binarization.binarize(test);
-			int[][] matTest = Binarization.imgToMat(test);
-			double testVect[] = OCR.aplastar(matTest);
-			neuralNetwork.setInput(testVect);// vect de una imagen esperada
-			neuralNetwork.calculate();
+		ImagePlus baseImage = IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\001_1.jpg");
+		IJ.run(baseImage, "Make Binary", "");
+		IJ.run(baseImage, "Skeletonize", "");
+		BufferedImage bfIBaseImage = baseImage.getBufferedImage();
+		int[][] sklBaseImage = HelperMethods.imgToMat(bfIBaseImage);
+		List<Point> mntBaseImage = Fingerprint.getMinutiaes(sklBaseImage);
+		mntBaseImage = Fingerprint.removeFalseMinutae2(sklBaseImage, mntBaseImage);
+		List<MinutaePoint> mpBaseImage = new ArrayList<MinutaePoint>();
+		for (Point p : mntBaseImage) {
+			Point[] vecinos = Fingerprint.getNearestNeighbourType(p, mntBaseImage);
+			MinutaePoint pMin = Fingerprint.getMinutaePoint(p, vecinos);
+			mpBaseImage.add(pMin);
+		}
 
-			System.out.println("imagen: " + i + " result number: " + (neuralNetwork.getOutput()[0]) + " "
-					+ neuralNetwork.getOutput()[1] + " " + neuralNetwork.getOutput()[2] + " "
-					+ neuralNetwork.getOutput()[3]);
-		}*/
+		ImagePlus inputImage = IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\001_2.jpg");
+		IJ.run(inputImage, "Make Binary", "");
+		IJ.run(inputImage, "Skeletonize", "");
+		BufferedImage bfIInputImage = inputImage.getBufferedImage();
+		int[][] sklInputImage = HelperMethods.imgToMat(bfIInputImage);
+		List<Point> mntInputImage = Fingerprint.getMinutiaes(sklInputImage);
+		mntInputImage = Fingerprint.removeFalseMinutae2(sklInputImage, mntInputImage);
+
+		List<MinutaePoint> mpInputImage = new ArrayList<MinutaePoint>();
+		for (Point p : mntInputImage) {
+			Point[] vecinos = Fingerprint.getNearestNeighbourType(p, mntInputImage);
+			MinutaePoint pMin = Fingerprint.getMinutaePoint(p, vecinos);
+			mpInputImage.add(pMin);
+		}
+		//CcpMinutaes ccpMinutaes = Fingerprint.compareMinutaePoint(mpBaseImage, mpInputImage);
+		List<MinutaePoint> c2B = Fingerprint.compareMinutaePoint2(mpBaseImage, mpInputImage);
+		List<MinutaePoint> c2I = Fingerprint.compareMinutaePoint2(mpInputImage, mpBaseImage);
+		Point[] cordOrdBase = new Point[c2B.size()];
+		Point[] cordOrdInput = new Point[c2I.size()];
+		
+		int cont = 0;
+		for (MinutaePoint point : c2B) {
+			cordOrdBase[cont++] = point.getCord();
+			
+		}
+		//HelperMethods.quickSort(cordOrdBase, 0, cordOrdBase.length-1, cordOrdBase[0]);
+		for(Point point : cordOrdBase){
+			System.out.println("Base : x = " + point.getX() + " y = " + point.getY());
+		}
+		cont = 0;
+		for (MinutaePoint point : c2I) {
+			cordOrdInput[cont++] = point.getCord();
+			
+		}
+		//HelperMethods.quickSort(cordOrdInput, 0, cordOrdInput.length-1, cordOrdInput[0]);
+		for(Point point : cordOrdInput){
+			System.out.println("Input : x = " + point.getX() + " y = " + point.getY());
+		}
+		/*
+		 * Mnist mmm = new Mnist("t10k-labels.idx1-ubyte",
+		 * "t10k-images.idx3-ubyte"); List<DigitImage> list =
+		 * mmm.loadDigitImages();
+		 * 
+		 * int i = 0; for (DigitImage img : list) { BufferedImage img2 = new
+		 * BufferedImage(28, 28, BufferedImage.TYPE_INT_ARGB); byte[] arr =
+		 * img.getImageData(); System.out.println("numero " + img.getLabel());
+		 * 
+		 * int cont = 0; for (int w = 0; w < 28; w++) { for (int y = 0; y < 28;
+		 * y++) { img2.setRGB(y, w, arr[cont++]); } }
+		 * 
+		 * ImagePlus imp = new ImagePlus("img", img2); IJ.run(imp, "Make Binary"
+		 * , ""); IJ.saveAs(imp, "Jpeg",
+		 * "C:\\Users\\samoel\\Desktop\\TestImage\\mnist\\p"+i+".jpg"); i++;
+		 * /*JPanel mainPanel = new JPanel(new BorderLayout()); JLabel lblimage
+		 * = new JLabel(new ImageIcon(imp.getBufferedImage()));
+		 * mainPanel.add(lblimage); JFrame frame = new JFrame();
+		 * frame.getContentPane().add(lblimage, BorderLayout.CENTER);
+		 * frame.setSize(500, 500); frame.setVisible(true);
+		 * Binarizacion.writeImage(imp.getBufferedImage(), "esqueleto"); break;
+		 */
+
+		// }
+		/*
+		 * Ocrv2 ocr = new Ocrv2(); ocr.add_actionPerformed(); ocr.trainSOM();
+		 * for(int i = 1 ; i <25;i++){ System.out.print("p" + i +": ");
+		 * ocr.recognize_actionPerformed(i); }
+		 * 
+		 * /* BasicNetwork network = new BasicNetwork(); network.addLayer(new
+		 * BasicLayer(null, true, 784)); network.addLayer(new BasicLayer(new
+		 * ActivationElliott(), true, 100)); network.addLayer(new BasicLayer(new
+		 * ActivationElliott(), true, 10));
+		 * network.getStructure().finalizeStructure(); network.reset();
+		 * 
+		 * MLDataSet trainingSet = MNISTReader.getDataSet(
+		 * "C:\\Users\\samoel\\Desktop\\Dp1\\t10k-labels.idx1-ubyte",
+		 * "C:\\Users\\samoel\\Desktop\\Dp1\\t10k-images.idx3-ubyte");
+		 * Propagation train = new
+		 * org.encog.neural.networks.training.propagation.resilient.
+		 * ResilientPropagation(network, trainingSet);
+		 * 
+		 * int epochsCount = 100; for (int epoch = 1; epoch < epochsCount;
+		 * epoch++) { train.iteration(); System.out.println("i :" + epoch); }
+		 * 
+		 * train.finishTraining(); for (int i = 1; i < 25; i++) { ImagePlus imp
+		 * = IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\test\\p" + 1 +
+		 * ".JPG"); IJ.run(imp, "Make Binary", ""); IJ.run(imp, "XOR...",
+		 * "value=11110000"); BufferedImage img = imp.getBufferedImage(); img =
+		 * OCR.resizeImage(img, 28, 28, img.getType()); MLData input = new
+		 * BasicMLData(OCR.imgToDouble(img)); int winner =
+		 * network.winner(input); System.out.println("winner? : " + winner); }
+		 * 
+		 * // IJ.run(imp, "XOR...", "value=11110000"); // OCR ocr = new OCR();
+		 * /* DataSet trainingSet = null; // trainingSet.save(
+		 * "C:\\Users\\samoel\\Desktop\\TestImage\\prep\\tset.data");
+		 * trainingSet =
+		 * DataSet.load("C:\\Users\\samoel\\Desktop\\TestImage\\prep\\tset.data"
+		 * ); NeuralNetwork neuralNetwork = new
+		 * MultiLayerPerceptron(TransferFunctionType.SIGMOID, 784, 784, 4);
+		 * BackPropagation backPropagation = new BackPropagation();
+		 * backPropagation.setMaxIterations(10);
+		 * //neuralNetwork.learn(trainingSet, backPropagation);
+		 * 
+		 * /*for (int i = 1; i < 25; i++) { BufferedImage test =
+		 * ImageIO.read(new
+		 * File("C:\\Users\\samoel\\Desktop\\TestImage\\test\\p" + i + ".jpg"));
+		 * test = OCR.resizeImage(test, 28, 28, test.getType()); test =
+		 * Binarization.binarize(test); int[][] matTest =
+		 * Binarization.imgToMat(test); double testVect[] =
+		 * OCR.aplastar(matTest); neuralNetwork.setInput(testVect);// vect de
+		 * una imagen esperada neuralNetwork.calculate();
+		 * 
+		 * System.out.println("imagen: " + i + " result number: " +
+		 * (neuralNetwork.getOutput()[0]) + " " + neuralNetwork.getOutput()[1] +
+		 * " " + neuralNetwork.getOutput()[2] + " " +
+		 * neuralNetwork.getOutput()[3]); }
+		 */
 
 		/*
 		 * String file = "C:/Users/samoel/Desktop/TestImage/ff3.jpg"; in =
