@@ -7,11 +7,9 @@ import java.io.IOException;
 
 import ij.IJ;
 import ij.ImagePlus;
-import net.coobird.thumbnailator.Thumbnails;
 import pe.pucp.edu.pe.siscomfi.Binarization;
 import pe.pucp.edu.pe.siscomfi.HelperMethods;
 import pe.pucp.edu.pe.siscomfi.NoiseFilter;
-import pe.pucp.edu.pe.siscomfi.OCR;
 
 public class Signatures {
 
@@ -99,25 +97,26 @@ public class Signatures {
 			// pFinal = p1;
 			// pFinal.setAngle(angle - Math.PI / 2);
 		}
-		double angleFF = angleP/5;
-		Point pX = new Point(0,0);
+		double angleFF = angleP / 5;
+		Point pX = new Point(0, 0);
 		pX.setAngle(angleFF);
 		return pX;
-		
-		  /*int y1 = 1; Point p1 = null; for (int i = img.getHeight() - 1; i >=
-		  0; i--) { if (img.getRGB(y1, i) == Color.BLACK.getRGB()) { p1 = new
-		  Point(i, y1); break; } } int y2 = img.getWidth() - 1; Point p2 =
-		  null; for (int i = img.getHeight() - 1; i >= 0; i--) { if
-		  (img.getRGB(y2, i) == Color.BLACK.getRGB()) { p2 = new Point(i, y2);
-		  break; } }
-		  
-		  double angle = p1.getAnglePoint(p2); Point pFinal = p1;
-		  pFinal.setAngle(angle - Math.PI / 2);
-		 return pFinal;*/
+
+		/*
+		 * int y1 = 1; Point p1 = null; for (int i = img.getHeight() - 1; i >=
+		 * 0; i--) { if (img.getRGB(y1, i) == Color.BLACK.getRGB()) { p1 = new
+		 * Point(i, y1); break; } } int y2 = img.getWidth() - 1; Point p2 =
+		 * null; for (int i = img.getHeight() - 1; i >= 0; i--) { if
+		 * (img.getRGB(y2, i) == Color.BLACK.getRGB()) { p2 = new Point(i, y2);
+		 * break; } }
+		 * 
+		 * double angle = p1.getAnglePoint(p2); Point pFinal = p1;
+		 * pFinal.setAngle(angle - Math.PI / 2); return pFinal;
+		 */
 		// System.out.println("angle anterior: " + Math.toDegrees(angle));
 		// System.out.println("angle final:
 		// "+Math.toDegrees(pFinal.getAngle()));
-		
+
 	}
 
 	private static double compare(BufferedImage cDbimg, BufferedImage crop2) {
@@ -146,33 +145,47 @@ public class Signatures {
 		ImagePlus impOriginal = new ImagePlus("", original);
 		IJ.run(impOriginal, "Make Binary", "");
 		original = impOriginal.getBufferedImage();
-		Rectangle rDbimg = Signatures.getRectangularArea(original);
-		BufferedImage cDbimg = original.getSubimage((int) rDbimg.getY(), (int) rDbimg.getX(), (int) rDbimg.getHeight(),
-				(int) rDbimg.getWidth());
+		Rectangle recOriginal = Signatures.getRectangularArea(original);
+		impOriginal.setRoi((int) recOriginal.getY(), (int) recOriginal.getX(), (int) recOriginal.getHeight(),
+				(int) recOriginal.getWidth());
+		IJ.run(impOriginal, "Crop", "");
+		BufferedImage ccOriginal = impOriginal.getBufferedImage();
+
 		// suspect
 		ImagePlus impSuspect = new ImagePlus("", suspect);
 		IJ.run(impSuspect, "Make Binary", "");
-		
 		suspect = impSuspect.getBufferedImage();
-		Rectangle rec = Signatures.getRectangularArea(suspect);
+		Rectangle recSuspect = Signatures.getRectangularArea(suspect);
+
 		// cortamos segun el rectangulo
-		BufferedImage crop = suspect.getSubimage((int) rec.getY(), (int) rec.getX(), (int) rec.getHeight(),
-				(int) rec.getWidth());
-		// saca el angulo de rotacion y rotamos
-		Point pRot = Signatures.getAngleImage(crop);
-		System.out.println(Math.toDegrees(pRot.getAngle()));
-		BufferedImage rot = crop;
+		impSuspect.setRoi((int) recSuspect.getY(), (int) recSuspect.getX(), (int) recSuspect.getHeight(),
+				(int) recSuspect.getWidth());
+		IJ.run(impSuspect, "Crop", "");
+		BufferedImage ccSuspect = impSuspect.getBufferedImage();
+
+		// saca el angulo de rotacion
+		Point pRot = Signatures.getAngleImage(ccSuspect);
+		System.out.println("Angle: " + Math.toDegrees(pRot.getAngle()));
+		// rotamos la imagen
 		if (Math.toDegrees(pRot.getAngle()) > 11)
-			rot = HelperMethods.rotate(crop, pRot.getAngle());
+			IJ.run(impSuspect, "Rotate... ",
+					"angle=" + Math.toDegrees(pRot.getAngle()) + " grid=1 interpolation=Bilinear enlarge");
 		if (Math.toDegrees(pRot.getAngle()) < 0)
-			rot = HelperMethods.rotate(crop, pRot.getAngle());
+			IJ.run(impSuspect, "Rotate... ",
+					"angle=" + Math.toDegrees(pRot.getAngle()) + " grid=1 interpolation=Bilinear enlarge");
+		IJ.run(impSuspect, "Make Binary", "");
+		
 		// formamos el rectangulo denuevo
-		Rectangle rec2 = Signatures.getRectangularArea(rot);
-		BufferedImage crop2 = rot.getSubimage((int) rec2.getY(), (int) rec2.getX(), (int) rec2.getHeight(),
-				(int) rec2.getWidth());
+		Rectangle rec2 = Signatures.getRectangularArea(impSuspect.getBufferedImage());
+		//System.out.println("x: " + rec2.getX() + " y: " + rec2.getY() + " h: " + rec2.getHeight() + " w: " + rec2.getWidth());
+		ImagePlus impSuspectN = new ImagePlus("", impSuspect.getBufferedImage());
+		impSuspectN.setRoi((int) rec2.getY(), (int) rec2.getX(), (int) rec2.getHeight(), (int) rec2.getWidth());
+		IJ.run(impSuspectN, "Crop", "");
+		BufferedImage ccSuspectN = impSuspectN.getBufferedImage();
+		ccSuspectN = HelperMethods.resizeImage(ccSuspectN, ccOriginal.getWidth(), ccOriginal.getHeight(),
+				ccOriginal.getType());
 		// w,h
-		crop2 = OCR.resizeImage(crop2, crop2.getWidth(), crop2.getHeight(), crop2.getType());
-		double res = compare(cDbimg, crop2);
+		double res = compare(ccOriginal, ccSuspectN);
 		return res;
 	}
 }

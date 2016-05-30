@@ -10,6 +10,10 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import ij.IJ;
+import ij.ImagePlus;
+import ij.plugin.Resizer;
+import ij.process.ImageProcessor;
 import net.coobird.thumbnailator.Thumbnails;
 import pe.pucp.edu.pe.siscomfi.Binarization;
 import pe.pucp.edu.pe.siscomfi.CcpMinutaes;
@@ -80,7 +84,7 @@ public class Fingerprint {
 		int comp = 0;
 		for (MinutaeTuple mtBase : base) {
 			for (MinutaeTuple mtInput : input) {
-				boolean mRatio = mtBase.getRatio() == mtInput.getRatio() ;
+				boolean mRatio = mtBase.getRatio() == mtInput.getRatio();
 				boolean mAngle = Math.abs(mtBase.getAngle() - mtInput.getAngle()) <= 3.5;
 				if (mRatio && mAngle)
 					comp++;
@@ -90,6 +94,7 @@ public class Fingerprint {
 		}
 		return false;
 	}
+
 	public static List<MinutaePoint> compareMinutaePoint2(List<MinutaePoint> base, List<MinutaePoint> input) {
 		List<MinutaePoint> ccpBase = new ArrayList<MinutaePoint>();
 		boolean arrBool[] = new boolean[input.size()];
@@ -109,6 +114,7 @@ public class Fingerprint {
 		}
 		return ccpBase;
 	}
+
 	public static CcpMinutaes compareMinutaePoint(List<MinutaePoint> base, List<MinutaePoint> input) {
 		List<MinutaePoint> ccpBase = new ArrayList<MinutaePoint>();
 		List<MinutaePoint> ccpInput = new ArrayList<MinutaePoint>();
@@ -360,9 +366,8 @@ public class Fingerprint {
 				for (int j = 0; j < aT.length; j++) {
 					if (aT[j] != 0) {
 						double pesosT = aT[j];
-						if (Math.abs(pesoS - pesosT) < 10) {
+						if (Math.abs(pesoS - pesosT) < 3.5) {
 							cont_umb++;
-
 						} else
 							break;
 					}
@@ -370,10 +375,14 @@ public class Fingerprint {
 			}
 		}
 		// System.out.println(cont_umb);
-		boolean matchNeigh = (cont_umb / k) > 0.5;
+		boolean matchNeigh = (cont_umb*1.0 / k) > 0.75;
 		return matchNeigh;
 	}
-
+	public static String resultado (double res){
+		if(res >= 0.9) return "Iguales";
+		if(res < 0.9 && res >= 0.6) return "Observado";
+		return "Diferentes";
+	}
 	public static double[][] matToGraph(List<Point> minutaes) {
 		double[][] grafoS = new double[minutaes.size()][k];
 		for (int i = 0; i < minutaes.size(); i++) {
@@ -402,31 +411,29 @@ public class Fingerprint {
 						break;
 					}
 				}
-
 			}
 		}
-		// System.out.println(match);
-		// System.out.println(grafoT.length);
-		// System.out.println(grafoS.length);
 		double comparition = (Math.pow(match, 2) / (grafoT.length * grafoS.length));
-		return comparition;
+		double ratio = (grafoT.length < grafoS.length) ? grafoT.length*1.0 / grafoS.length : grafoS.length*1.0 / grafoT.length;
+		return comparition * ratio;
 	}
 
 	public static double[][] imageGraph(String filename1) {
-		try {
-			BufferedImage in = ImageIO.read(new File(filename1));
-			in = Thumbnails.of(in).size(600, 600).asBufferedImage();
-			BufferedImage bin = Binarization.binarize(in);
-			int[][] mati = Binarization.imgToMat(bin);
-			int[][] ske = Thining.doZhangSuenThinning(mati, false);
-			List<Point> fMinutaes = Fingerprint.getMinutiaes(ske);
-			List<Point> tMinutaes = Fingerprint.removeFalseMinutae2(ske, fMinutaes);
-			double[][] grafoS = Fingerprint.matToGraph(tMinutaes);
-			return grafoS;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+		ImagePlus fingerprint = IJ.openImage(filename1);
+		ImageProcessor imp_fing = fingerprint.getProcessor();
+		imp_fing.setInterpolate(true);
+		imp_fing = imp_fing.resize(600, 600);
+
+		ImagePlus newFing = new ImagePlus("small", imp_fing);
+		IJ.run(newFing, "Make Binary", "");
+		IJ.run(newFing, "Skeletonize", "");
+		BufferedImage bin = newFing.getBufferedImage();
+
+		int[][] ske = Binarization.imgToMat(bin);
+		List<Point> fMinutaes = Fingerprint.getMinutiaes(ske);
+		List<Point> tMinutaes = Fingerprint.removeFalseMinutae2(ske, fMinutaes);
+		double[][] grafoS = Fingerprint.matToGraph(tMinutaes);
+		return grafoS;
 	}
 
 	public static double matchFingerprints(String filename1, String filename2) {

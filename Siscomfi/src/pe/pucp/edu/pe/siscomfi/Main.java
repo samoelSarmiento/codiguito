@@ -1,57 +1,8 @@
 package pe.pucp.edu.pe.siscomfi;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import org.encog.engine.network.activation.ActivationElliott;
-import org.encog.ml.data.MLData;
-import org.encog.ml.data.MLDataSet;
-import org.encog.ml.data.basic.BasicMLData;
-import org.encog.ml.data.basic.BasicMLDataSet;
-import org.encog.ml.data.buffer.MemoryDataLoader;
-import org.encog.neural.networks.BasicNetwork;
-import org.encog.neural.networks.layers.BasicLayer;
-import org.encog.neural.networks.training.propagation.Propagation;
-import org.encog.neural.networks.training.propagation.resilient.*;
-import org.encog.platformspecific.j2se.data.image.ImageMLData;
-import org.neuroph.core.NeuralNetwork;
-import org.neuroph.core.data.DataSet;
-import org.neuroph.nnet.MultiLayerPerceptron;
-import org.neuroph.nnet.learning.BackPropagation;
-import org.neuroph.nnet.learning.ResilientPropagation;
-
-import org.neuroph.util.TransferFunctionType;
-
-import ij.IJ;
-import ij.ImagePlus;
-import ij.Prefs;
-import ij.plugin.Duplicator;
-import net.coobird.thumbnailator.Thumbnailator;
-import net.coobird.thumbnailator.Thumbnails;
 import pe.pucp.edu.pe.siscomfi.controller.Fingerprint;
-import pe.pucp.edu.pe.siscomfi.controller.Point;
-import pe.pucp.edu.pe.siscomfi.controller.Signatures;
-import sourceafis.simple.AfisEngine;
-import sourceafis.simple.Person;
+
 
 public class Main {
 
@@ -79,68 +30,85 @@ public class Main {
 		 * HelperMethods.getPartesFila(lista.get(1), recortadoOriginal);
 		 * for(ImagePlus mm : parteLista){ mm.show(); }
 		 */
+
+		double[][] graphOriginal = Fingerprint.imageGraph("C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\002_2.jpg");
+		String filename = "";
+		for (int i = 2; i < 50; i++) {
+			for (int j = 1; j < 3; j++) {
+				if (i < 10)
+					filename = "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\00" + i + "_" + j + ".jpg";
+				else
+					filename = "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\0" + i + "_" + j + ".jpg";
+				
+				double[][] graphSuspect = Fingerprint.imageGraph(filename);
+				double res = Fingerprint.comparition(graphOriginal, graphSuspect);
+				System.out.println(Fingerprint.resultado(res) + " Porcentaje: " + res);
+			}
+		}
 		
-		ImagePlus baseImage = IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\001_1.jpg");
-		IJ.run(baseImage, "Make Binary", "");
-		IJ.run(baseImage, "Skeletonize", "");
-		BufferedImage bfIBaseImage = baseImage.getBufferedImage();
-		int[][] sklBaseImage = HelperMethods.imgToMat(bfIBaseImage);
-		List<Point> mntBaseImage = Fingerprint.getMinutiaes(sklBaseImage);
-		mntBaseImage = Fingerprint.removeFalseMinutae2(sklBaseImage, mntBaseImage);
-		List<MinutaePoint> mpBaseImage = new ArrayList<MinutaePoint>();
-		for (Point p : mntBaseImage) {
-			Point[] vecinos = Fingerprint.getNearestNeighbourType(p, mntBaseImage);
-			MinutaePoint pMin = Fingerprint.getMinutaePoint(p, vecinos);
-			mpBaseImage.add(pMin);
-		}
+		
+		
+		/*
+		 * ImagePlus impOriginal =
+		 * IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\f3.jpg");
+		 * ImagePlus impSuspect =
+		 * IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\ff.jpg");;
+		 * double res =
+		 * Signatures.compareSignatures(impOriginal.getBufferedImage(),
+		 * impSuspect.getBufferedImage()); System.out.println(res);
+		 */
+		/*
+		 * NUEVO INTENTO DE HUELLAS ImagePlus baseImage = IJ.openImage(
+		 * "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\001_1.jpg");
+		 * IJ.run(baseImage, "Make Binary", ""); IJ.run(baseImage,
+		 * "Skeletonize", ""); BufferedImage bfIBaseImage =
+		 * baseImage.getBufferedImage(); int[][] sklBaseImage =
+		 * HelperMethods.imgToMat(bfIBaseImage); List<Point> mntBaseImage =
+		 * Fingerprint.getMinutiaes(sklBaseImage); mntBaseImage =
+		 * Fingerprint.removeFalseMinutae2(sklBaseImage, mntBaseImage);
+		 * List<MinutaePoint> mpBaseImage = new ArrayList<MinutaePoint>(); for
+		 * (Point p : mntBaseImage) { Point[] vecinos =
+		 * Fingerprint.getNearestNeighbourType(p, mntBaseImage); MinutaePoint
+		 * pMin = Fingerprint.getMinutaePoint(p, vecinos);
+		 * mpBaseImage.add(pMin); }
+		 * 
+		 * ImagePlus inputImage = IJ.openImage(
+		 * "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\001_2.jpg");
+		 * IJ.run(inputImage, "Make Binary", ""); IJ.run(inputImage,
+		 * "Skeletonize", ""); BufferedImage bfIInputImage =
+		 * inputImage.getBufferedImage(); int[][] sklInputImage =
+		 * HelperMethods.imgToMat(bfIInputImage); List<Point> mntInputImage =
+		 * Fingerprint.getMinutiaes(sklInputImage); mntInputImage =
+		 * Fingerprint.removeFalseMinutae2(sklInputImage, mntInputImage);
+		 * 
+		 * List<MinutaePoint> mpInputImage = new ArrayList<MinutaePoint>(); for
+		 * (Point p : mntInputImage) { Point[] vecinos =
+		 * Fingerprint.getNearestNeighbourType(p, mntInputImage); MinutaePoint
+		 * pMin = Fingerprint.getMinutaePoint(p, vecinos);
+		 * mpInputImage.add(pMin); } //CcpMinutaes ccpMinutaes =
+		 * Fingerprint.compareMinutaePoint(mpBaseImage, mpInputImage);
+		 * List<MinutaePoint> c2B =
+		 * Fingerprint.compareMinutaePoint2(mpBaseImage, mpInputImage);
+		 * List<MinutaePoint> c2I =
+		 * Fingerprint.compareMinutaePoint2(mpInputImage, mpBaseImage); Point[]
+		 * cordOrdBase = new Point[c2B.size()]; Point[] cordOrdInput = new
+		 * Point[c2I.size()]; //base int cont = 0; for (MinutaePoint point :
+		 * c2B) { cordOrdBase[cont++] = point.getCord(); } Point[] arrAux = new
+		 * Point[cordOrdBase.length-1]; for(int i = 1 ; i <
+		 * cordOrdBase.length;i++) arrAux[i-1] = cordOrdBase[i];
+		 * Arrays.sort(arrAux); for(int i = 0 ; i < arrAux.length;i++)
+		 * cordOrdBase[i+1] = arrAux[i]; for(Point point : cordOrdBase){
+		 * System.out.println("Base : x = " + point.getX() + " y = " +
+		 * point.getY()); } //input cont = 0; for (MinutaePoint point : c2I) {
+		 * cordOrdInput[cont++] = point.getCord(); } Point[] arrAux2 = new
+		 * Point[cordOrdInput.length-1]; for(int i = 1 ; i <
+		 * cordOrdInput.length;i++) arrAux2[i-1] = cordOrdInput[i];
+		 * Arrays.sort(arrAux2); for(int i = 0 ; i < arrAux2.length;i++)
+		 * cordOrdInput[i+1] = arrAux2[i]; for(Point point : cordOrdInput){
+		 * System.out.println("Input : x = " + point.getX() + " y = " +
+		 * point.getY()); }
+		 */
 
-		ImagePlus inputImage = IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\001_2.jpg");
-		IJ.run(inputImage, "Make Binary", "");
-		IJ.run(inputImage, "Skeletonize", "");
-		BufferedImage bfIInputImage = inputImage.getBufferedImage();
-		int[][] sklInputImage = HelperMethods.imgToMat(bfIInputImage);
-		List<Point> mntInputImage = Fingerprint.getMinutiaes(sklInputImage);
-		mntInputImage = Fingerprint.removeFalseMinutae2(sklInputImage, mntInputImage);
-
-		List<MinutaePoint> mpInputImage = new ArrayList<MinutaePoint>();
-		for (Point p : mntInputImage) {
-			Point[] vecinos = Fingerprint.getNearestNeighbourType(p, mntInputImage);
-			MinutaePoint pMin = Fingerprint.getMinutaePoint(p, vecinos);
-			mpInputImage.add(pMin);
-		}
-		//CcpMinutaes ccpMinutaes = Fingerprint.compareMinutaePoint(mpBaseImage, mpInputImage);
-		List<MinutaePoint> c2B = Fingerprint.compareMinutaePoint2(mpBaseImage, mpInputImage);
-		List<MinutaePoint> c2I = Fingerprint.compareMinutaePoint2(mpInputImage, mpBaseImage);
-		Point[] cordOrdBase = new Point[c2B.size()];
-		Point[] cordOrdInput = new Point[c2I.size()];
-		//base
-		int cont = 0;
-		for (MinutaePoint point : c2B) {
-			cordOrdBase[cont++] = point.getCord();
-		}
-		Point[] arrAux = new Point[cordOrdBase.length-1];
-		for(int i = 1 ; i < cordOrdBase.length;i++)
-			arrAux[i-1] = cordOrdBase[i];
-		Arrays.sort(arrAux);
-		for(int i = 0 ; i < arrAux.length;i++)
-			cordOrdBase[i+1] = arrAux[i];
-		for(Point point : cordOrdBase){
-			System.out.println("Base : x = " + point.getX() + " y = " + point.getY());
-		}
-		//input		
-		cont = 0;
-		for (MinutaePoint point : c2I) {
-			cordOrdInput[cont++] = point.getCord();
-		}
-		Point[] arrAux2 = new Point[cordOrdInput.length-1];
-		for(int i = 1 ; i < cordOrdInput.length;i++)
-			arrAux2[i-1] = cordOrdInput[i];
-		Arrays.sort(arrAux2);
-		for(int i = 0 ; i < arrAux2.length;i++)
-			cordOrdInput[i+1] = arrAux2[i];
-		for(Point point : cordOrdInput){
-			System.out.println("Input : x = " + point.getX() + " y = " + point.getY());
-		}
 		/*
 		 * Mnist mmm = new Mnist("t10k-labels.idx1-ubyte",
 		 * "t10k-images.idx3-ubyte"); List<DigitImage> list =

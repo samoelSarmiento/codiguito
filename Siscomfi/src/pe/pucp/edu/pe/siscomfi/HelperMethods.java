@@ -298,4 +298,11 @@ public class HelperMethods {
 		return gd.getDefaultConfiguration();
 	}
 
+	public static BufferedImage resizeImage(BufferedImage originalImage, int width, int height, int type) {
+		BufferedImage resizedImage = new BufferedImage(width, height, type);
+		Graphics2D g = resizedImage.createGraphics();
+		g.drawImage(originalImage, 0, 0, width, height, null);
+		g.dispose();
+		return resizedImage;
+	}
 }
