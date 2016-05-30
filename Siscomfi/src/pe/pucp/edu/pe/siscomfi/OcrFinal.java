@@ -28,7 +28,7 @@ public class OcrFinal {
 	private final Entry entry = new Entry();
 	private final DefaultListModel letterListModel = new DefaultListModel();
 	private final List<String> lettersL = new ArrayList<String>();
-	private final Sample sample = new Sample(OcrEncog.DOWNSAMPLE_WIDTH, OcrEncog.DOWNSAMPLE_HEIGHT);
+	private final Sample sample = new Sample(OcrTrainer.DOWNSAMPLE_WIDTH, OcrTrainer.DOWNSAMPLE_HEIGHT);
 	private SOM net;
 
 	private BufferedImage mnistToBImg(DigitImage img) {
@@ -46,33 +46,7 @@ public class OcrFinal {
 		return imp.getBufferedImage();
 	}
 
-	private void add_actionPerformed() throws IOException {
-		int i;
-		Mnist mmm = new Mnist("t10k-labels.idx1-ubyte", "t10k-images.idx3-ubyte");
-		List<DigitImage> list = mmm.loadDigitImages();
-		this.entry.setSample(this.sample);
-		for (int w = 0; w < list.size(); w++) {
-			DigitImage mnistImage = list.get(w);
-			String letter = mnistImage.getLabel() + "";
-			lettersL.add(letter);
-
-			this.entry.entryImage = mnistToBImg(mnistImage);
-			this.entry.downSample();
-			final SampleData sampleData = (SampleData) this.sample.getData().clone();
-			sampleData.setLetter(letter.charAt(0));
-			this.letterListModel.add(this.letterListModel.size(), sampleData);
-		}
-	}
-
-	public static BufferedImage resizeImage(BufferedImage originalImage, int width, int height, int type) {
-		BufferedImage resizedImage = new BufferedImage(width, height, type);
-		Graphics2D g = resizedImage.createGraphics();
-		g.drawImage(originalImage, 0, 0, width, height, null);
-		g.dispose();
-		return resizedImage;
-	}
-
-	public void load_actionPerformed() {
+	public void cargarEntrenamiento() {
 		try {
 			FileReader f;// the actual file stream
 			BufferedReader r;// used to read the file line by line
@@ -86,8 +60,8 @@ public class OcrFinal {
 			this.lettersL.clear();
 			while ((line = r.readLine()) != null) {
 				lettersL.add("" + line.charAt(0));
-				final SampleData ds = new SampleData(line.charAt(0), OcrEncog.DOWNSAMPLE_WIDTH,
-						OcrEncog.DOWNSAMPLE_HEIGHT);
+				final SampleData ds = new SampleData(line.charAt(0), OcrTrainer.DOWNSAMPLE_WIDTH,
+						OcrTrainer.DOWNSAMPLE_HEIGHT);
 				this.letterListModel.add(i++, ds);
 				int idx = 2;
 				for (int y = 0; y < ds.getHeight(); y++) {
@@ -104,18 +78,16 @@ public class OcrFinal {
 		}
 	}
 
-	public void recognize_actionPerformed(BufferedImage image) {
+	public String reconocer(BufferedImage image) {
 		if (this.net == null) {
-			System.out.println("I need to be trained first!");
-			return;
+			System.out.println("Red Neuronal no entrenada!");
+			return "";
 		}
-		// SampleData sdata = new SampleData(' ', image.getWidth(),
-		// image.getHeight());
 		this.entry.setSample(this.sample);
 		this.entry.entryImage = image;
 		this.entry.downSample();
 
-		final MLData input = new BasicMLData(OcrEncog.DOWNSAMPLE_WIDTH * OcrEncog.DOWNSAMPLE_HEIGHT);
+		final MLData input = new BasicMLData(OcrTrainer.DOWNSAMPLE_WIDTH * OcrTrainer.DOWNSAMPLE_HEIGHT);
 		int idx = 0;
 		final SampleData ds = this.sample.getData();
 		for (int y = 0; y < ds.getHeight(); y++) {
@@ -126,13 +98,13 @@ public class OcrFinal {
 
 		final int best = this.net.classify(input);
 		final String letra = lettersL.get(best);
-		System.out.println("That Letter Is " + letra + " (Neuron #" + best + " fired)");
-
+		System.out.println("La letra es " + letra + " (Neurona #" + best + " fired)");
+		return letra;
 	}
 
-	public void trainSOM() {
+	public void entrenarRed() {
 		try {
-			final int inputNeuron = OcrEncog.DOWNSAMPLE_HEIGHT * OcrEncog.DOWNSAMPLE_WIDTH;
+			final int inputNeuron = OcrTrainer.DOWNSAMPLE_HEIGHT * OcrTrainer.DOWNSAMPLE_WIDTH;
 			final int outputNeuron = this.letterListModel.size();
 
 			final MLDataSet trainingSet = new BasicMLDataSet();
@@ -159,6 +131,5 @@ public class OcrFinal {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 }

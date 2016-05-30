@@ -1,22 +1,27 @@
 package pe.pucp.edu.pe.siscomfi;
 
+import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
-import pe.pucp.edu.pe.siscomfi.controller.Fingerprint;
 
+import ij.IJ;
+import ij.ImagePlus;
+import pe.pucp.edu.pe.siscomfi.controller.Fingerprint;
 
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-
-		/*
-		 * CARGAR OCR - COMPARAR OcrFinal ocr = new OcrFinal();
-		 * ocr.load_actionPerformed(); ocr.trainSOM(); for (int i = 1; i < 25;
-		 * i++) { ImagePlus imp =
-		 * IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\test\\p" + i +
-		 * ".JPG"); IJ.run(imp, "Make Binary", ""); //imp.show(); BufferedImage
-		 * img = imp.getBufferedImage(); System.out.print("resultado de p" + i +
-		 * ": "); ocr.recognize_actionPerformed(img); }
-		 */
+		// CARGAR OCR - COMPARAR
+		OcrFinal ocr = new OcrFinal();
+		ocr.cargarEntrenamiento();
+		ocr.entrenarRed();
+		for (int i = 1; i < 25; i++) {
+			ImagePlus imp = IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\test\\p" + i + ".JPG");
+			IJ.run(imp, "Make Binary", ""); // imp.show(); BufferedImage
+			BufferedImage img = imp.getBufferedImage();
+			System.out.print("resultado de p" + i + ": ");
+			ocr.reconocer(img);
+		}
 
 		/*
 		 * PARTE PARA CORTAR PLANILLON ImagePlus img = IJ.openImage(
@@ -31,23 +36,23 @@ public class Main {
 		 * for(ImagePlus mm : parteLista){ mm.show(); }
 		 */
 
-		double[][] graphOriginal = Fingerprint.imageGraph("C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\002_2.jpg");
-		String filename = "";
-		for (int i = 2; i < 50; i++) {
-			for (int j = 1; j < 3; j++) {
-				if (i < 10)
-					filename = "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\00" + i + "_" + j + ".jpg";
-				else
-					filename = "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\0" + i + "_" + j + ".jpg";
-				
-				double[][] graphSuspect = Fingerprint.imageGraph(filename);
-				double res = Fingerprint.comparition(graphOriginal, graphSuspect);
-				System.out.println(Fingerprint.resultado(res) + " Porcentaje: " + res);
-			}
-		}
-		
-		
-		
+		/*
+		 * HUELLAS ACTUAL MEJORADO double[][] graphOriginal =
+		 * Fingerprint.imageGraph(
+		 * "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\002_2.jpg"); String
+		 * filename = ""; for (int i = 2; i < 50; i++) { for (int j = 1; j < 3;
+		 * j++) { if (i < 10) filename =
+		 * "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\00" + i + "_" + j +
+		 * ".jpg"; else filename =
+		 * "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\0" + i + "_" + j +
+		 * ".jpg";
+		 * 
+		 * double[][] graphSuspect = Fingerprint.imageGraph(filename); double
+		 * res = Fingerprint.comparition(graphOriginal, graphSuspect);
+		 * System.out.println(Fingerprint.resultado(res) + " Porcentaje: " +
+		 * res); } }
+		 */
+
 		/*
 		 * ImagePlus impOriginal =
 		 * IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\f3.jpg");

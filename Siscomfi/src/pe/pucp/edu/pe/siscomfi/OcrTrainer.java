@@ -1,21 +1,19 @@
 package pe.pucp.edu.pe.siscomfi;
 
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,7 +23,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 
 import org.encog.ml.data.MLData;
@@ -42,31 +39,31 @@ import ij.ImagePlus;
 /**
  * OCR: Main form that allows the user to interact with the OCR application.
  */
-public class OcrEncog extends JFrame {
+public class OcrTrainer extends JFrame {
 
 	class SymAction implements java.awt.event.ActionListener {
 		public void actionPerformed(final java.awt.event.ActionEvent event) {
 			final Object object = event.getSource();
-			if (object == OcrEncog.this.downSample) {
+			if (object == OcrTrainer.this.downSample) {
 				downSample_actionPerformed(event);
-			} else if (object == OcrEncog.this.clear) {
+			} else if (object == OcrTrainer.this.clear) {
 				clear_actionPerformed(event);
-			} else if (object == OcrEncog.this.add) {
+			} else if (object == OcrTrainer.this.add) {
 				try {
 					add_actionPerformed(event);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} else if (object == OcrEncog.this.del) {
+			} else if (object == OcrTrainer.this.del) {
 				del_actionPerformed(event);
-			} else if (object == OcrEncog.this.load) {
+			} else if (object == OcrTrainer.this.load) {
 				load_actionPerformed(event);
-			} else if (object == OcrEncog.this.save) {
+			} else if (object == OcrTrainer.this.save) {
 				save_actionPerformed(event);
-			} else if (object == OcrEncog.this.train) {
+			} else if (object == OcrTrainer.this.train) {
 				train_actionPerformed(event);
-			} else if (object == OcrEncog.this.recognize) {
+			} else if (object == OcrTrainer.this.recognize) {
 				recognize_actionPerformed(event);
 			}
 		}
@@ -75,7 +72,7 @@ public class OcrEncog extends JFrame {
 	class SymListSelection implements javax.swing.event.ListSelectionListener {
 		public void valueChanged(final javax.swing.event.ListSelectionEvent event) {
 			final Object object = event.getSource();
-			if (object == OcrEncog.this.letters) {
+			if (object == OcrTrainer.this.letters) {
 				letters_valueChanged(event);
 			}
 		}
@@ -103,12 +100,8 @@ public class OcrEncog extends JFrame {
 	 *            Args not really used.
 	 */
 	public static void main(final String args[]) {
-		(new OcrEncog()).setVisible(true);
+		(new OcrTrainer()).setVisible(true);
 	}
-
-	private final NumberFormat numberFormat;
-
-	private boolean halt;
 
 	/**
 	 * The entry component for the user to draw into.
@@ -129,11 +122,6 @@ public class OcrEncog extends JFrame {
 	 * The neural network.
 	 */
 	private SOM net;
-
-	/**
-	 * The background thread used for training.
-	 */
-	private Thread trainThread = null;
 
 	private final JLabel JLabel1 = new javax.swing.JLabel();
 
@@ -197,14 +185,14 @@ public class OcrEncog extends JFrame {
 	/**
 	 * The constructor.
 	 */
-	OcrEncog() {
+	OcrTrainer() {
 		getContentPane().setLayout(null);
 		this.entry = new Entry();
 		this.entry.setLocation(168, 25);
 		this.entry.setSize(200, 128);
 		getContentPane().add(this.entry);
 
-		this.sample = new Sample(OcrEncog.DOWNSAMPLE_WIDTH, OcrEncog.DOWNSAMPLE_HEIGHT);
+		this.sample = new Sample(OcrTrainer.DOWNSAMPLE_WIDTH, OcrTrainer.DOWNSAMPLE_HEIGHT);
 		this.sample.setLocation(307, 210);
 		this.sample.setSize(65, 70);
 
@@ -280,7 +268,7 @@ public class OcrEncog extends JFrame {
 		this.letters.setModel(this.letterListModel);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-		this.numberFormat = NumberFormat.getNumberInstance();
+		NumberFormat.getNumberInstance();
 	}
 
 	private BufferedImage mnistToBImg(DigitImage img) {
@@ -306,9 +294,7 @@ public class OcrEncog extends JFrame {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	void add_actionPerformed(final java.awt.event.ActionEvent event) throws IOException {
-		int i;
-
+	public void add_actionPerformed(final ActionEvent event) throws IOException {
 		Mnist mmm = new Mnist("t10k-labels.idx1-ubyte", "t10k-images.idx3-ubyte");
 		List<DigitImage> list = mmm.loadDigitImages();
 		for (int w = 0; w < list.size(); w++) {
@@ -418,8 +404,8 @@ public class OcrEncog extends JFrame {
 			this.letterListModel.clear();
 
 			while ((line = r.readLine()) != null) {
-				final SampleData ds = new SampleData(line.charAt(0), OcrEncog.DOWNSAMPLE_WIDTH,
-						OcrEncog.DOWNSAMPLE_HEIGHT);
+				final SampleData ds = new SampleData(line.charAt(0), OcrTrainer.DOWNSAMPLE_WIDTH,
+						OcrTrainer.DOWNSAMPLE_HEIGHT);
 				this.letterListModel.add(i++, ds);
 				int idx = 2;
 				for (int y = 0; y < ds.getHeight(); y++) {
@@ -453,7 +439,7 @@ public class OcrEncog extends JFrame {
 			map[i] = '?';
 		}
 		for (int i = 0; i < this.letterListModel.size(); i++) {
-			final MLData input = new BasicMLData(OcrEncog.DOWNSAMPLE_WIDTH * OcrEncog.DOWNSAMPLE_HEIGHT);
+			final MLData input = new BasicMLData(OcrTrainer.DOWNSAMPLE_WIDTH * OcrTrainer.DOWNSAMPLE_HEIGHT);
 			int idx = 0;
 			final SampleData ds = (SampleData) this.letterListModel.getElementAt(i);
 			for (int y = 0; y < ds.getHeight(); y++) {
@@ -481,7 +467,7 @@ public class OcrEncog extends JFrame {
 		}
 		this.entry.downSample();
 
-		final MLData input = new BasicMLData(OcrEncog.DOWNSAMPLE_WIDTH * OcrEncog.DOWNSAMPLE_HEIGHT);
+		final MLData input = new BasicMLData(OcrTrainer.DOWNSAMPLE_WIDTH * OcrTrainer.DOWNSAMPLE_HEIGHT);
 		int idx = 0;
 		final SampleData ds = this.sample.getData();
 		for (int y = 0; y < ds.getHeight(); y++) {
@@ -503,7 +489,7 @@ public class OcrEncog extends JFrame {
 	 */
 	public void trainSOM() {
 		try {
-			final int inputNeuron = OcrEncog.DOWNSAMPLE_HEIGHT * OcrEncog.DOWNSAMPLE_WIDTH;
+			final int inputNeuron = OcrTrainer.DOWNSAMPLE_HEIGHT * OcrTrainer.DOWNSAMPLE_WIDTH;
 			final int outputNeuron = this.letterListModel.size();
 
 			final MLDataSet trainingSet = new BasicMLDataSet();
@@ -542,7 +528,7 @@ public class OcrEncog extends JFrame {
 	 * @param event
 	 *            The event
 	 */
-	void save_actionPerformed(final java.awt.event.ActionEvent event) {
+	public void save_actionPerformed(final java.awt.event.ActionEvent event) {
 		try {
 			OutputStream os;// the actual file stream
 			PrintStream ps;// used to read the file line by line
@@ -579,7 +565,7 @@ public class OcrEncog extends JFrame {
 	 * @param event
 	 *            The event.
 	 */
-	void train_actionPerformed(final java.awt.event.ActionEvent event) {
+	public void train_actionPerformed(final java.awt.event.ActionEvent event) {
 		trainSOM();
 	}
 }
