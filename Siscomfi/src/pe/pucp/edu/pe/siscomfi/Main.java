@@ -3,16 +3,21 @@ package pe.pucp.edu.pe.siscomfi;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.plugin.Duplicator;
 import pe.pucp.edu.pe.siscomfi.controller.Fingerprint;
 
 public class Main {
 
 	public static void main(String[] args) throws IOException {
 		// CARGAR OCR - COMPARAR
-		OcrFinal ocr = new OcrFinal();
+
+		/*OcrFinal ocr = new OcrFinal();
 		ocr.cargarEntrenamiento();
 		ocr.entrenarRed();
 		for (int i = 1; i < 25; i++) {
@@ -21,25 +26,25 @@ public class Main {
 			BufferedImage img = imp.getBufferedImage();
 			System.out.print("resultado de p" + i + ": ");
 			ocr.reconocer(img);
-		}
+		}*/
 
+		// PARTE PARA CORTAR PLANILLON
 		/*
-		 * PARTE PARA CORTAR PLANILLON ImagePlus img = IJ.openImage(
+		 * ImagePlus img = IJ.openImage(
 		 * "C:\\Users\\samoel\\Desktop\\TestImage\\padron\\padron3.jpg");
-		 * ImagePlus recortado = HelperMethods.recortarPlanillon(img,img);
+		 * ImagePlus recortado = HelperMethods.recortarPlanillon(img, img);
 		 * ImagePlus recortadoOriginal = new Duplicator().run(recortado);
 		 * 
 		 * List<ImagePlus> lista = HelperMethods.getFilasPlanillon(recortado);
-		 * 
-		 * List<ImagePlus> parteLista =
-		 * HelperMethods.getPartesFila(lista.get(1), recortadoOriginal);
-		 * for(ImagePlus mm : parteLista){ mm.show(); }
+		 * for (ImagePlus mm : lista) { //mm.show(); } List<ImagePlus>
+		 * parteLista = HelperMethods.getPartesFila(lista.get(1),
+		 * recortadoOriginal); for (ImagePlus mm : parteLista) { mm.show(); }
 		 */
 
+		// HUELLAS ACTUAL MEJORADO
 		/*
-		 * HUELLAS ACTUAL MEJORADO double[][] graphOriginal =
-		 * Fingerprint.imageGraph(
-		 * "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\002_2.jpg"); String
+		 * double[][] graphOriginal = Fingerprint.imageGraph(
+		 * "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\002_1.jpg"); String
 		 * filename = ""; for (int i = 2; i < 50; i++) { for (int j = 1; j < 3;
 		 * j++) { if (i < 10) filename =
 		 * "C:\\Users\\samoel\\Desktop\\TestImage\\nuevo\\00" + i + "_" + j +
@@ -54,7 +59,7 @@ public class Main {
 		 */
 
 		/*
-		 * ImagePlus impOriginal =
+		 * FIRMAS ImagePlus impOriginal =
 		 * IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\f3.jpg");
 		 * ImagePlus impSuspect =
 		 * IJ.openImage("C:\\Users\\samoel\\Desktop\\TestImage\\ff.jpg");;

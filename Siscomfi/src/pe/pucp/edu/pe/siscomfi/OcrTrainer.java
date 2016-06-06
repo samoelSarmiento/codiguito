@@ -14,6 +14,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -35,6 +36,7 @@ import org.encog.neural.som.training.clustercopy.SOMClusterCopyTraining;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.process.ImageProcessor;
 
 /**
  * OCR: Main form that allows the user to interact with the OCR application.
@@ -86,12 +88,12 @@ public class OcrTrainer extends JFrame {
 	/**
 	 * The downsample width for the application.
 	 */
-	static final int DOWNSAMPLE_WIDTH = 28;
+	static final int DOWNSAMPLE_WIDTH = 50;
 
 	/**
 	 * The down sample height for the application.
 	 */
-	static final int DOWNSAMPLE_HEIGHT = 28;
+	static final int DOWNSAMPLE_HEIGHT = 50;
 
 	/**
 	 * The main method.
@@ -283,7 +285,11 @@ public class OcrTrainer extends JFrame {
 
 		ImagePlus imp = new ImagePlus("img", img2);
 		IJ.run(imp, "Make Binary", "");
+		String a ="";
+		
 		return imp.getBufferedImage();
+		
+		
 	}
 
 	/**
@@ -293,6 +299,79 @@ public class OcrTrainer extends JFrame {
 	 *            The event
 	 * @throws IOException
 	 */
+	
+	String getLabelLetra(int snum){
+		String letras ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		char[] letrasC  =letras.toCharArray();
+		return ""+letrasC[snum-11];
+	}
+	public void add_actionPerformed2(final ActionEvent event) throws IOException {
+		/*Mnist mmm = new Mnist("t10k-labels.idx1-ubyte", "t10k-images.idx3-ubyte");
+		List<DigitImage> list = mmm.loadDigitImages();*/
+		String  n = "C:\\Users\\inf250\\Downloads\\English\\Hnd\\Img\\Sample0";
+		int w = 0;
+		for(int snum = 11 ; snum < 63; snum++){
+			for(int nimg = 1; nimg < 56; nimg ++){
+				if(snum < 10)
+					n = "C:\\Users\\inf250\\Downloads\\English\\Hnd\\Img\\Sample00" + snum + "\\img00" + snum+"-";
+				else
+					n = "C:\\Users\\inf250\\Downloads\\English\\Hnd\\Img\\Sample0" + snum + "\\img0" + snum+"-";
+				
+				if(nimg < 10)
+					n = n.concat("00"+nimg+".PNG");
+				else
+					n = n.concat("0"+nimg+".PNG");
+				
+				BufferedImage img = ImageIO.read(new File(n));
+				ImagePlus imgAux = new ImagePlus("",img);
+				ImageProcessor impAux = imgAux.getProcessor();
+				impAux.resize(50);
+				imgAux = new ImagePlus("",impAux);
+				IJ.run(imgAux,"Make Binary","");
+				IJ.run(imgAux,"Skeletonize","");
+				img = imgAux.getBufferedImage();
+				//img = HelperMethods.resizeImage(img, 28, 28, img.getType());
+				this.entry.entryImage = img;
+				String letter = getLabelLetra(snum); 
+				System.out.println("letra " + (w+1)+ ": " + letter);
+				lettersL.add(letter);
+				this.entry.downSample();
+				final SampleData sampleData = (SampleData) this.sample.getData().clone();
+				sampleData.setLetter(letter.charAt(0));
+				this.letterListModel.add(this.letterListModel.size(),sampleData);
+				this.letters.setSelectedIndex(w);
+				w++;
+			}
+		}
+		/*for (int w = 0; w < list.size(); w++) {
+			DigitImage mnistImage = list.get(w);
+			this.entry.entryImage = mnistToBImg(mnistImage);
+			String letter = mnistImage.getLabel() + "";
+			lettersL.add(letter);
+			System.out.println("numero : " + letter);
+			this.entry.downSample();
+			final SampleData sampleData = (SampleData) this.sample.getData().clone();
+			sampleData.setLetter(letter.charAt(0));
+			/*
+			 * for (i = 0; i < this.letterListModel.size(); i++) { final
+			 * Comparable str = (Comparable)
+			 * this.letterListModel.getElementAt(i); if (str.equals(letter)) {
+			 * JOptionPane.showMessageDialog(this,
+			 * "That letter is already defined, delete it first!", "Error",
+			 * JOptionPane.ERROR_MESSAGE); return; }
+			 * 
+			 * if (str.compareTo(sampleData) > 0) { this.letterListModel.add(i,
+			 * sampleData); return; } }
+			 */
+			/*this.letterListModel.add(this.letterListModel.size(), sampleData);
+			this.letters.setSelectedIndex(w);
+
+		}*/
+		this.entry.initImage();
+		this.entry.clear();
+		this.sample.repaint();
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void add_actionPerformed(final ActionEvent event) throws IOException {
 		Mnist mmm = new Mnist("t10k-labels.idx1-ubyte", "t10k-images.idx3-ubyte");
