@@ -52,7 +52,7 @@ public class OcrTrainer extends JFrame {
 				clear_actionPerformed(event);
 			} else if (object == OcrTrainer.this.add) {
 				try {
-					add_actionPerformed(event);
+					add_actionPerformed2(event);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -308,14 +308,15 @@ public class OcrTrainer extends JFrame {
 	public void add_actionPerformed2(final ActionEvent event) throws IOException {
 		/*Mnist mmm = new Mnist("t10k-labels.idx1-ubyte", "t10k-images.idx3-ubyte");
 		List<DigitImage> list = mmm.loadDigitImages();*/
-		String  n = "C:\\Users\\inf250\\Downloads\\English\\Hnd\\Img\\Sample0";
+		String  n = "";
 		int w = 0;
 		for(int snum = 11 ; snum < 63; snum++){
 			for(int nimg = 1; nimg < 56; nimg ++){
+				//"C:\Users\samoel\Downloads\English\Hnd\Img"
 				if(snum < 10)
-					n = "C:\\Users\\inf250\\Downloads\\English\\Hnd\\Img\\Sample00" + snum + "\\img00" + snum+"-";
+					n = "C:\\Users\\samoel\\Downloads\\English\\Hnd\\Img\\Sample00" + snum + "\\img00" + snum+"-";
 				else
-					n = "C:\\Users\\inf250\\Downloads\\English\\Hnd\\Img\\Sample0" + snum + "\\img0" + snum+"-";
+					n = "C:\\Users\\samoel\\Downloads\\English\\Hnd\\Img\\Sample0" + snum + "\\img0" + snum+"-";
 				
 				if(nimg < 10)
 					n = n.concat("00"+nimg+".PNG");

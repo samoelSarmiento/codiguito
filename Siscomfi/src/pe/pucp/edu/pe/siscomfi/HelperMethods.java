@@ -18,17 +18,18 @@ import ij.process.ImageProcessor;
 import pe.pucp.edu.pe.siscomfi.controller.Point;
 
 public class HelperMethods {
-	
-	public static byte[][] imgToByte(int[][] img){
+
+	public static byte[][] imgToByte(int[][] img) {
 		byte[][] arr = new byte[img[0].length][img.length];
-		for(int i = 0 ; i < img[0].length;i++){
-			for(int j = 0 ; j < img.length;j++){
-				arr[i][j] = (byte)img[i][j];
+		for (int i = 0; i < img[0].length; i++) {
+			for (int j = 0; j < img.length; j++) {
+				arr[i][j] = (byte) img[i][j];
 			}
-		}		
+		}
 		return arr;
 	}
-	public static double getAngle3Point(Point p1, Point p2, Point p3){
+
+	public static double getAngle3Point(Point p1, Point p2, Point p3) {
 		double p12 = p1.euclideanDistance(p2);
 		double p13 = p1.euclideanDistance(p3);
 		double p23 = p2.euclideanDistance(p3);
@@ -37,9 +38,10 @@ public class HelperMethods {
 		double pp23 = Math.pow(p23, 2);
 		double pNum = pp12 + pp13 - pp23;
 		double pDem = 2 * p12 * p13;
-		double angle = Math.acos(pNum/pDem);
-		return angle;		
+		double angle = Math.acos(pNum / pDem);
+		return angle;
 	}
+
 	public static int getTamTabla(ImagePlus planillon) {
 		int x = 1;
 		int y = 0;
@@ -114,7 +116,7 @@ public class HelperMethods {
 		return filas;
 	}
 
-	public static int[][] imgToMat(BufferedImage bin){
+	public static int[][] imgToMat(BufferedImage bin) {
 		int[][] mati = new int[bin.getWidth()][];
 		for (int x = 0; x < bin.getWidth(); x++) {
 			mati[x] = new int[bin.getHeight()];
@@ -124,7 +126,7 @@ public class HelperMethods {
 		}
 		return mati;
 	}
-	
+
 	public static List<ImagePlus> getPartesFila(ImagePlus fila, ImagePlus planillon) {
 		IJ.run(planillon, "Make Binary", "");
 		int x = 5;
@@ -134,12 +136,12 @@ public class HelperMethods {
 			r = planillon.getPixel(x, y)[0];
 			y++;
 		}
-		//System.out.println("TopNegro:" + y);
+		// System.out.println("TopNegro:" + y);
 		while (r != 0) {
 			r = planillon.getPixel(x, y)[0];
 			y++;
 		}
-		//System.out.println("BotNegro:" + y);
+		// System.out.println("BotNegro:" + y);
 		int[] tCampos = new int[5];
 
 		for (int i = 0; i < 5; i++) {
@@ -148,13 +150,13 @@ public class HelperMethods {
 				x++;
 			}
 			int xLeft = x;
-			//System.out.print("Campo: " + i + " FilaLeft: " + xLeft);
+			// System.out.print("Campo: " + i + " FilaLeft: " + xLeft);
 			while (r == 0) {
 				r = planillon.getPixel(x, y)[0];
 				x++;
 			}
 			int xRight = x;
-			//System.out.println(" FilaRight: " + xRight);
+			// System.out.println(" FilaRight: " + xRight);
 			int espacioCampo = xRight - xLeft + 1;
 			tCampos[i] = espacioCampo;
 		}
@@ -163,13 +165,13 @@ public class HelperMethods {
 		int dist_x = 5 + tCampos[0];
 		for (int w = 1; w < 5; w++) {
 			System.out.print("Antes: " + dist_x + " Tam: " + tCampos[w]);
-			
+
 			System.out.println(" Despues:" + dist_x);
-			fila.setRoi(dist_x,0,tCampos[w],fila.getHeight());
+			fila.setRoi(dist_x, 0, tCampos[w], fila.getHeight());
 			IJ.run(fila, "Crop", "");
 			partes.add(fila);
 			fila = new Duplicator().run(filaOriginal);
-			dist_x += tCampos[w];	
+			dist_x += tCampos[w];
 		}
 		return partes;
 	}
